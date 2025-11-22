@@ -5,6 +5,8 @@
 
 static double Shape_area(Shape *s)
 {
+    double base = s->w * s->h;
+    printf("[Shape.area] base=%.2f\n", base);
     return s->w * s->h;
 }
 
