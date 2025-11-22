@@ -2,6 +2,7 @@
 #define TRIANGLE_H
 
 #include "Rectangle.h"
+#include "Shape.h"
 
 #define TRIANGLE_ONLY_FIELD_LIST \
   X(sideLength, double)
@@ -28,13 +29,14 @@ struct Triangle
   TRIANGLE_FIELD_LIST
 #undef X
 
-  Rectangle_Fn *superFn; /* base vtable */
+  Shape_Fn *superFn; /* base vtable */
   Triangle_Fn *fn;       /* own vtable */
 };
 
 /* Triangle vtable */
 struct Triangle_Fn
 {
+  struct Triangle_Fn *super;
   #define METHOD(ret, name, ptype) ret (*name)(Triangle *);
     TRIANGLE_METHOD_LIST
   #undef METHOD

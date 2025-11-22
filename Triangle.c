@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "Triangle.h"
+#include "Rectangle.h"
 #include <string.h>
 #include "iam.h"
 /* ---- Implementations ---- */
@@ -9,7 +10,7 @@ static double Triangle_area(Triangle *r)
 {
     double base = r->superFn->area((Rectangle*)r);
     printf("[Triangle.area] base=%.2f\n", base);
-    return base * r->multiplier * 10;
+    return base * r->multiplier * 15;
 }
 
 static double Triangle_scaledArea(Triangle *r)
@@ -70,7 +71,7 @@ __attribute__((constructor)) static void Triangle_auto(void)
 Triangle *Triangle_new()
 {
     Triangle *r = NEW(Triangle);
-    r->superFn = &Rectangle_fn;
+    r->superFn = &Shape_fn;
     r->fn = &Triangle_fn;
 
     return r;

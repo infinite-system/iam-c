@@ -8,7 +8,7 @@
 
 static double Rectangle_area(Rectangle *r)
 {
-    double base = SUPER(r, area);
+    double base = r->superFn->area((Shape*)r);
     return base * r->multiplier;
 }
 

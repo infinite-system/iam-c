@@ -14,10 +14,11 @@ int main()
     Rectangle *r = Rectangle_new();
     r->w = 10;
     r->h = 5;
-    r->multiplier = 3;
+    r->multiplier = 5;
 
     r->fn->describe(r);
     printf("[Rectangle] perimeter=%.2f\n", r->fn->perimeter(r));
+    printf("[Rectangle] area=%.2f\n", r->fn->area(r));
 
     Triangle *t = Triangle_new();
     t->w = 10;
