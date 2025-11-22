@@ -1,0 +1,15 @@
+{
+  "files.associations": {
+    "*.embeddedhtml": "html",
+    "*.dbclient-js": "javascript",
+    "typeinfo": "c",
+    "string.h": "c",
+    "__hash_table": "c",
+    "array": "c",
+    "complex": "c",
+    "type_traits": "c",
+    "limits": "c",
+    "ratio": "c",
+    "variant": "c"
+  }
+}
