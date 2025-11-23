@@ -10,9 +10,9 @@
 
 /* X-macro method lists */
 #define SHAPE_METHOD_LIST            \
-  METHOD(double, area, Shape *)      \
-  METHOD(double, perimeter, Shape *) \
-  METHOD(void, describe, Shape *)
+  METHOD(double, area)      \
+  METHOD(double, perimeter) \
+  METHOD(void, describe)
 
 /* Generate struct */
 typedef struct Shape
@@ -27,7 +27,7 @@ typedef struct Shape
 /* vtable */
 typedef struct Shape_Fn
 {
-#define METHOD(ret, name, ptype) ret (*name)(ptype);
+#define METHOD(ret, name) ret (*name)(Shape *);
   SHAPE_METHOD_LIST
 #undef METHOD
 } Shape_Fn;

@@ -10,6 +10,7 @@
     "type_traits": "c",
     "limits": "c",
     "ratio": "c",
-    "variant": "c"
+    "variant": "c",
+    "bitset": "c"
   }
 }

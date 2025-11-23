@@ -12,20 +12,20 @@ int main()
     t->multiplier = 3;
 
     t->fn->describe(t);
-    Shape *s = Shape_new();
-    s->w = 4;
-    s->h = 3;
+    // Shape *s = Shape_new();
+    // s->w = 4;
+    // s->h = 3;
 
-    s->fn->describe(s);
+    // s->fn->describe(s);
 
-    Rectangle *r = Rectangle_new();
-    r->w = 10;
-    r->h = 5;
-    r->multiplier = 5;
+    // Rectangle *r = Rectangle_new();
+    // r->w = 10;
+    // r->h = 5;
+    // r->multiplier = 5;
 
-    r->fn->describe(r);
-    printf("[Rectangle] perimeter=%.2f\n", r->fn->perimeter(r));
-    printf("[Rectangle] area=%.2f\n", r->fn->area(r));
+    // r->fn->describe(r);
+    // printf("[Rectangle] perimeter=%.2f\n", r->fn->perimeter(r));
+    // printf("[Rectangle] area=%.2f\n", r->fn->area(r));
 
 
     return 0;

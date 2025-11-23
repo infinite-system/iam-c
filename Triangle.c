@@ -10,9 +10,9 @@ static double area(Triangle *r)
 {
     /* 'super' is stored as void* in the fn table; cast it to Rectangle_Fn* to access area */
     printf("[Triangle.area] called\n");
-    double base = SUPER(Triangle, r, area);
+    double base = SUPER(Rectangle, r, area);
     printf("[Triangle.area] base=%.2f\n", base);
-    return base * r->multiplier * 1;
+    return base * r->multiplier * 2;
 }
 
 static double scaledArea(Triangle *r)

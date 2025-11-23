@@ -12,10 +12,10 @@
   TRIANGLE_ONLY_FIELD_LIST;
 
 #define TRIANGLE_ONLY_METHOD_LIST      \
-  METHOD(double, sideArea, Triangle *) \
-  METHOD(double, rightAngle, Triangle *);
+  METHOD(double, sideArea) \
+  METHOD(double, rightAngle);
 
-#define Triangle_METHOD_LIST \
+#define TRIANGLE_METHOD_LIST \
   RECTANGLE_METHOD_LIST      \
   TRIANGLE_ONLY_METHOD_LIST;
 
@@ -35,8 +35,8 @@ struct Triangle
 struct Triangle_Fn
 {
   void *super;
-  #define METHOD(ret, name, ptype) ret (*name)(Triangle *);
-  Triangle_METHOD_LIST
+  #define METHOD(ret, name) ret (*name)(Triangle *);
+  TRIANGLE_METHOD_LIST
   #undef METHOD
 };
 

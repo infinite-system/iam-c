@@ -10,8 +10,8 @@
   RECTANGLE_ONLY_FIELD_LIST
 
 #define RECTANGLE_ONLY_METHOD_LIST        \
-  METHOD(double, scaledArea, Rectangle *) \
-  METHOD(double, diagonal, Rectangle *)
+  METHOD(double, scaledArea) \
+  METHOD(double, diagonal)
 #define RECTANGLE_METHOD_LIST \
   SHAPE_METHOD_LIST           \
   RECTANGLE_ONLY_METHOD_LIST
@@ -32,7 +32,7 @@ typedef struct Rectangle
 struct Rectangle_Fn
 {
   void *super; /* placeholder for inheritance */
-#define METHOD(ret, name, ptype) ret (*name)(Rectangle *);
+#define METHOD(ret, name) ret (*name)(Rectangle *);
   RECTANGLE_METHOD_LIST
 #undef METHOD
 };

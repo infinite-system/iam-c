@@ -6,29 +6,29 @@
 #include "iam.h"
 /* ---- Implementations ---- */
 
-static double Rectangle_area(Rectangle *r)
+static double area(Rectangle *r)
 {
   printf("[Rectangle.area] called\n");
-  double base = SUPER(Rectangle, r, area);
+  double base = SUPER(Shape, r, area);
   printf("[Rectangle.area] base=%.2f\n", base);
   return base * r->multiplier * 3;
 }
 
-static double Rectangle_scaledArea(Rectangle *r)
+static double scaledArea(Rectangle *r)
 {
   return r->w * r->h * r->multiplier;
 }
 
-static double Rectangle_diagonal(Rectangle *r)
+static double diagonal(Rectangle *r)
 {
   return sqrt(r->w * r->w + r->h * r->h);
 }
 
-static void Rectangle_describe(Rectangle *r)
+static void describe(Rectangle *r)
 {
   printf("[Rectangle] scaled=%.2f diag=%.2f\n",
-         Rectangle_scaledArea(r),
-         Rectangle_diagonal(r));
+         scaledArea(r),
+         diagonal(r));
 }
 
 Rectangle_Fn Rectangle_fn;
@@ -40,12 +40,12 @@ static void Rectangle_init(void)
 
   Rectangle_fn.super = &Shape_fn;
   /* overrides */
-  Rectangle_fn.area = Rectangle_area;         // override
-  Rectangle_fn.describe = Rectangle_describe; // override
+  Rectangle_fn.area = area;         // override
+  Rectangle_fn.describe = describe; // override
 
   /* child only */
-  Rectangle_fn.scaledArea = Rectangle_scaledArea;
-  Rectangle_fn.diagonal = Rectangle_diagonal;
+  Rectangle_fn.scaledArea = scaledArea;
+  Rectangle_fn.diagonal = diagonal;
 }
 
 /* auto-run before main */

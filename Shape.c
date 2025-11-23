@@ -3,23 +3,23 @@
 
 /* ---- implementations ---- */
 
-static double Shape_area(Shape *s)
+static double area(Shape *s)
 {
-    double base = s->w * s->h;
-    printf("[Shape.area] base=%.2f\n", base);
-    return s->w * s->h;
+    double base = s->w * s->h * 3;
+    printf("[Shape.area] w=%.2f h=%.2f base=%.2f\n", s->w, s->h, base);
+    return base;
 }
 
-static double Shape_perimeter(Shape *s)
+static double perimeter(Shape *s)
 {
     return 2 * (s->w + s->h);
 }
 
-static void Shape_describe(Shape *s)
+static void describe(Shape *s)
 {
     printf("[Shape] w=%.2f h=%.2f area=%.2f\n",
-           s->w, s->h, Shape_area(s));
-}
+           s->w, s->h, area(s));
+} 
 
 /* ---- vtable ---- */
 
@@ -28,9 +28,9 @@ Shape_Fn Shape_fn;
 /* class initializer */
 static void Shape_init(void)
 {
-    Shape_fn.area      = Shape_area;
-    Shape_fn.perimeter = Shape_perimeter;
-    Shape_fn.describe  = Shape_describe;
+    Shape_fn.area      = area;
+    Shape_fn.perimeter = perimeter;
+    Shape_fn.describe  = describe;
 }
 
 /* auto-run BEFORE main() */
