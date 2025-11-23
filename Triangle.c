@@ -6,41 +6,43 @@
 #include "iam.h"
 /* ---- Implementations ---- */
 
-static double Triangle_area(Triangle *r)
+static double area(Triangle *r)
 {
-    double base = r->superFn->area((Rectangle*)r);
+    /* 'super' is stored as void* in the fn table; cast it to Rectangle_Fn* to access area */
+    printf("[Triangle.area] called\n");
+    double base = SUPER(Triangle, r, area);
     printf("[Triangle.area] base=%.2f\n", base);
-    return base * r->multiplier * 15;
+    return base * r->multiplier * 1;
 }
 
-static double Triangle_scaledArea(Triangle *r)
+static double scaledArea(Triangle *r)
 {
     return r->w * r->h * r->multiplier;
 }
 
-static double Triangle_diagonal(Triangle *r)
+static double diagonal(Triangle *r)
 {
     return sqrt(r->w * r->w + r->h * r->h);
 }
 
-static double Triangle_sideArea(Triangle *r)
+static double sideArea(Triangle *r)
 {
     return 0.5 * r->sideLength * r->h;
 }
 
-static double Triangle_rightAngle(Triangle *r)
+static double rightAngle(Triangle *r)
 {
     return 90.0;
 }
 
-static void Triangle_describe(Triangle *r)
+static void describe(Triangle *r)
 {
     printf("[Triangle] area=%.2f scaled=%.2f diag=%.2f side=%.2f angle=%.2f\n",
-           Triangle_area(r),
-           Triangle_scaledArea(r),
-           Triangle_diagonal(r),
-           Triangle_sideArea(r),
-           Triangle_rightAngle(r));
+           area(r),
+           scaledArea(r),
+           diagonal(r),
+           sideArea(r),
+           rightAngle(r));
 }
 
 Triangle_Fn Triangle_fn;
@@ -50,15 +52,16 @@ static void Triangle_init(void)
 {
     INHERIT_METHODS(Triangle_fn, Rectangle_fn); // auto copy
 
+    Triangle_fn.super = &Rectangle_fn;
     /* overrides */
-    Triangle_fn.area = Triangle_area;         // override
-    Triangle_fn.describe = Triangle_describe; // override
-    Triangle_fn.scaledArea = Triangle_scaledArea;
-    Triangle_fn.diagonal = Triangle_diagonal;
+    Triangle_fn.area = area;         // override
+    Triangle_fn.describe = describe; // override
+    Triangle_fn.scaledArea = scaledArea;
+    Triangle_fn.diagonal = diagonal;
 
     /* child only */
-    Triangle_fn.sideArea = Triangle_sideArea;
-    Triangle_fn.rightAngle = Triangle_rightAngle;
+    Triangle_fn.sideArea = sideArea;
+    Triangle_fn.rightAngle = rightAngle;
 }
 
 /* auto-run before main */
@@ -71,7 +74,6 @@ __attribute__((constructor)) static void Triangle_auto(void)
 Triangle *Triangle_new()
 {
     Triangle *r = NEW(Triangle);
-    r->superFn = &Shape_fn;
     r->fn = &Triangle_fn;
 
     return r;

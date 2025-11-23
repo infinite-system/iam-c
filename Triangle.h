@@ -15,7 +15,7 @@
   METHOD(double, sideArea, Triangle *) \
   METHOD(double, rightAngle, Triangle *);
 
-#define TRIANGLE_METHOD_LIST \
+#define Triangle_METHOD_LIST \
   RECTANGLE_METHOD_LIST      \
   TRIANGLE_ONLY_METHOD_LIST;
 
@@ -25,20 +25,18 @@ typedef struct Triangle_Fn Triangle_Fn;
 /* Child struct */
 struct Triangle
 {
-#define X(name, type) type name;
+  struct Triangle_Fn *fn;      /* own vtable */
+  #define X(name, type) type name;
   TRIANGLE_FIELD_LIST
-#undef X
-
-  Shape_Fn *superFn; /* base vtable */
-  Triangle_Fn *fn;       /* own vtable */
+  #undef X
 };
 
 /* Triangle vtable */
 struct Triangle_Fn
 {
-  struct Triangle_Fn *super;
+  void *super;
   #define METHOD(ret, name, ptype) ret (*name)(Triangle *);
-    TRIANGLE_METHOD_LIST
+  Triangle_METHOD_LIST
   #undef METHOD
 };
 

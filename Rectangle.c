@@ -8,9 +8,10 @@
 
 static double Rectangle_area(Rectangle *r)
 {
-  double base = r->superFn->area((Shape *)r);
+  printf("[Rectangle.area] called\n");
+  double base = SUPER(Rectangle, r, area);
   printf("[Rectangle.area] base=%.2f\n", base);
-  return base * r->multiplier * 9;
+  return base * r->multiplier * 3;
 }
 
 static double Rectangle_scaledArea(Rectangle *r)
@@ -37,6 +38,7 @@ static void Rectangle_init(void)
 {
   INHERIT_METHODS(Rectangle_fn, Shape_fn); // auto copy
 
+  Rectangle_fn.super = &Shape_fn;
   /* overrides */
   Rectangle_fn.area = Rectangle_area;         // override
   Rectangle_fn.describe = Rectangle_describe; // override
@@ -56,7 +58,6 @@ __attribute__((constructor)) static void Rectangle_auto(void)
 Rectangle *Rectangle_new()
 {
   Rectangle *r = NEW(Rectangle);
-  r->superFn = &Shape_fn;
   r->fn = &Rectangle_fn;
 
   return r;

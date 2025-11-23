@@ -1,0 +1,411 @@
+Filename: iam.h
+----------------------------------------
+#ifndef IAM_H
+#define IAM_H
+
+#include <stdlib.h>
+
+/* Allocate */
+#define NEW(T) (T*)malloc(sizeof(T))
+
+/* SUPER(r, area) */
+#define SUPER(self, METHOD) \
+    ((self)->fn->super->METHOD((void*)(self)))
+
+#define INHERIT_METHODS(child_fn, parent_fn) \
+    memcpy(&(child_fn), &(parent_fn), sizeof(parent_fn));
+
+#endif-e 
+
+
+Filename: main.c
+----------------------------------------
+#include "Shape.h"
+#include "Rectangle.h"
+#include "Triangle.h"
+#include <stdio.h>
+
+int main()
+{
+    Shape *s = Shape_new();
+    s->w = 4;
+    s->h = 3;
+
+    s->fn->describe(s);
+
+    Rectangle *r = Rectangle_new();
+    r->w = 10;
+    r->h = 5;
+    r->multiplier = 5;
+
+    r->fn->describe(r);
+    printf("[Rectangle] perimeter=%.2f\n", r->fn->perimeter(r));
+    printf("[Rectangle] area=%.2f\n", r->fn->area(r));
+
+    Triangle *t = Triangle_new();
+    t->w = 10;
+    t->h = 5;
+    t->sideLength = 6;
+    t->multiplier = 3;
+
+    t->fn->describe(t);
+
+    return 0;
+}-e 
+
+
+Filename: Rectangle.c
+----------------------------------------
+#include <stdio.h>
+#include <math.h>
+#include "Shape.h"
+#include "Rectangle.h"
+#include <string.h>
+#include "iam.h"
+/* ---- Implementations ---- */
+
+static double Rectangle_area(Rectangle *r)
+{
+  printf("[Rectangle.area] called\n");
+  double base = ((Shape_Fn *)r->fn->super)->area((Shape *)r);
+  printf("[Rectangle.area] base=%.2f\n", base);
+  return base * r->multiplier * 9;
+}
+
+static double Rectangle_scaledArea(Rectangle *r)
+{
+  return r->w * r->h * r->multiplier;
+}
+
+static double Rectangle_diagonal(Rectangle *r)
+{
+  return sqrt(r->w * r->w + r->h * r->h);
+}
+
+static void Rectangle_describe(Rectangle *r)
+{
+  printf("[Rectangle] scaled=%.2f diag=%.2f\n",
+         Rectangle_scaledArea(r),
+         Rectangle_diagonal(r));
+}
+
+Rectangle_Fn Rectangle_fn;
+
+/* class initializer */
+static void Rectangle_init(void)
+{
+  INHERIT_METHODS(Rectangle_fn, Shape_fn); // auto copy
+
+  Rectangle_fn.super = &Shape_fn;
+  /* overrides */
+  Rectangle_fn.area = Rectangle_area;         // override
+  Rectangle_fn.describe = Rectangle_describe; // override
+
+  /* child only */
+  Rectangle_fn.scaledArea = Rectangle_scaledArea;
+  Rectangle_fn.diagonal = Rectangle_diagonal;
+}
+
+/* auto-run before main */
+__attribute__((constructor)) static void Rectangle_auto(void)
+{
+  Rectangle_init();
+}
+
+/* ctor */
+Rectangle *Rectangle_new()
+{
+  Rectangle *r = NEW(Rectangle);
+  r->fn = &Rectangle_fn;
+  r->fn->super = &Shape_fn;
+
+  return r;
+}-e 
+
+
+Filename: Rectangle.h
+----------------------------------------
+#ifndef RECTANGLE_H
+#define RECTANGLE_H
+
+#include "Shape.h"
+
+#define RECTANGLE_ONLY_FIELD_LIST \
+  X(multiplier, double)
+
+#define RECTANGLE_FIELD_LIST \
+  SHAPE_FIELD_LIST           \
+  RECTANGLE_ONLY_FIELD_LIST;
+
+#define RECTANGLE_ONLY_METHOD_LIST        \
+  METHOD(double, scaledArea, Rectangle *) \
+  METHOD(double, diagonal, Rectangle *);
+
+#define RECTANGLE_METHOD_LIST \
+  SHAPE_METHOD_LIST           \
+  RECTANGLE_ONLY_METHOD_LIST;
+
+typedef struct Rectangle Rectangle;
+typedef struct Rectangle_Fn Rectangle_Fn;
+
+/* Child struct */
+typedef struct Rectangle
+{
+  struct Rectangle_Fn *fn; /* own vtable */
+  #define X(name, type) type name;
+  RECTANGLE_FIELD_LIST
+  #undef X
+} Rectangle;
+
+/* Rectangle vtable */
+struct Rectangle_Fn
+{
+  #define METHOD(ret, name, ptype) ret (*name)(Rectangle *);
+  RECTANGLE_METHOD_LIST
+  #undef METHOD
+  void *super; /* placeholder for inheritance */
+};
+
+extern Rectangle_Fn Rectangle_fn;
+
+Rectangle *Rectangle_new();
+
+#endif-e 
+
+
+Filename: Shape.c
+----------------------------------------
+#include <stdio.h>
+#include "Shape.h"
+
+/* ---- implementations ---- */
+
+static double Shape_area(Shape *s)
+{
+    double base = s->w * s->h;
+    printf("[Shape.area] base=%.2f\n", base);
+    return s->w * s->h;
+}
+
+static double Shape_perimeter(Shape *s)
+{
+    return 2 * (s->w + s->h);
+}
+
+static void Shape_describe(Shape *s)
+{
+    printf("[Shape] w=%.2f h=%.2f area=%.2f\n",
+           s->w, s->h, Shape_area(s));
+}
+
+/* ---- vtable ---- */
+
+Shape_Fn Shape_fn;
+
+/* class initializer */
+static void Shape_init(void)
+{
+    Shape_fn.area      = Shape_area;
+    Shape_fn.perimeter = Shape_perimeter;
+    Shape_fn.describe  = Shape_describe;
+}
+
+/* auto-run BEFORE main() */
+__attribute__((constructor))
+static void Shape_auto(void) {
+    Shape_init();
+}
+
+
+/* ---- constructor ---- */
+
+Shape *Shape_new()
+{
+    Shape *s = NEW(Shape);
+    s->fn = &Shape_fn;
+
+    return s;
+}-e 
+
+
+Filename: Shape.h
+----------------------------------------
+#ifndef SHAPE_H
+#define SHAPE_H
+
+#include "iam.h"
+
+/* X-macro field lists */
+#define SHAPE_FIELD_LIST \
+  X(w, double)           \
+  X(h, double)
+
+/* X-macro method lists */
+#define SHAPE_METHOD_LIST            \
+  METHOD(double, area, Shape *)      \
+  METHOD(double, perimeter, Shape *) \
+  METHOD(void, describe, Shape *)
+
+/* Generate struct */
+typedef struct Shape
+{
+  struct Shape_Fn *fn;
+  /* fields */
+  #define X(name, type) type name;
+  SHAPE_FIELD_LIST
+  #undef X
+} Shape;
+
+/* vtable */
+typedef struct Shape_Fn
+{
+#define METHOD(ret, name, ptype) ret (*name)(ptype);
+  SHAPE_METHOD_LIST
+#undef METHOD
+} Shape_Fn;
+
+extern Shape_Fn Shape_fn;
+
+/* ctor */
+Shape *Shape_new();
+
+#endif
+-e 
+
+
+Filename: Triangle.c
+----------------------------------------
+#include <stdio.h>
+#include <math.h>
+#include "Triangle.h"
+#include "Rectangle.h"
+#include <string.h>
+#include "iam.h"
+/* ---- Implementations ---- */
+
+static double Triangle_area(Triangle *r)
+{
+    /* 'super' is stored as void* in the fn table; cast it to Rectangle_Fn* to access area */
+    printf("[Triangle.area] called\n");
+    double base = ((Rectangle_Fn *)r->fn->super)->area((void *)r);
+    printf("[Triangle.area] base=%.2f\n", base);
+    return base * r->multiplier * 15;
+}
+
+static double Triangle_scaledArea(Triangle *r)
+{
+    return r->w * r->h * r->multiplier;
+}
+
+static double Triangle_diagonal(Triangle *r)
+{
+    return sqrt(r->w * r->w + r->h * r->h);
+}
+
+static double Triangle_sideArea(Triangle *r)
+{
+    return 0.5 * r->sideLength * r->h;
+}
+
+static double Triangle_rightAngle(Triangle *r)
+{
+    return 90.0;
+}
+
+static void Triangle_describe(Triangle *r)
+{
+    printf("[Triangle] area=%.2f scaled=%.2f diag=%.2f side=%.2f angle=%.2f\n",
+           Triangle_area(r),
+           Triangle_scaledArea(r),
+           Triangle_diagonal(r),
+           Triangle_sideArea(r),
+           Triangle_rightAngle(r));
+}
+
+Triangle_Fn Triangle_fn;
+
+/* class initializer */
+static void Triangle_init(void)
+{
+    INHERIT_METHODS(Triangle_fn, Rectangle_fn); // auto copy
+
+    Triangle_fn.super = &Rectangle_fn;
+    /* overrides */
+    Triangle_fn.area = Triangle_area;         // override
+    Triangle_fn.describe = Triangle_describe; // override
+    Triangle_fn.scaledArea = Triangle_scaledArea;
+    Triangle_fn.diagonal = Triangle_diagonal;
+
+    /* child only */
+    Triangle_fn.sideArea = Triangle_sideArea;
+    Triangle_fn.rightAngle = Triangle_rightAngle;
+}
+
+/* auto-run before main */
+__attribute__((constructor)) static void Triangle_auto(void)
+{
+    Triangle_init();
+}
+
+/* ctor */
+Triangle *Triangle_new()
+{
+    Triangle *r = NEW(Triangle);
+    r->fn = &Triangle_fn;
+    r->fn->super = &Rectangle_fn;
+
+    return r;
+}-e 
+
+
+Filename: Triangle.h
+----------------------------------------
+#ifndef TRIANGLE_H
+#define TRIANGLE_H
+
+#include "Rectangle.h"
+#include "Shape.h"
+
+#define TRIANGLE_ONLY_FIELD_LIST \
+  X(sideLength, double)
+
+#define TRIANGLE_FIELD_LIST \
+  RECTANGLE_FIELD_LIST      \
+  TRIANGLE_ONLY_FIELD_LIST;
+
+#define TRIANGLE_ONLY_METHOD_LIST      \
+  METHOD(double, sideArea, Triangle *) \
+  METHOD(double, rightAngle, Triangle *);
+
+#define TRIANGLE_METHOD_LIST \
+  RECTANGLE_METHOD_LIST      \
+  TRIANGLE_ONLY_METHOD_LIST;
+
+typedef struct Triangle Triangle;
+typedef struct Triangle_Fn Triangle_Fn;
+
+/* Child struct */
+struct Triangle
+{
+  struct Triangle_Fn *fn;      /* own vtable */
+  #define X(name, type) type name;
+  TRIANGLE_FIELD_LIST
+  #undef X
+};
+
+/* Triangle vtable */
+struct Triangle_Fn
+{
+  #define METHOD(ret, name, ptype) ret (*name)(Triangle *);
+  TRIANGLE_METHOD_LIST
+  #undef METHOD
+  void *super;
+};
+
+extern Triangle_Fn Triangle_fn;
+
+Triangle *Triangle_new();
+
+#endif-e 
+
+

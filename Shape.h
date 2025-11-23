@@ -17,18 +17,16 @@
 /* Generate struct */
 typedef struct Shape
 {
-/* fields */
-#define X(name, type) type name;
-  SHAPE_FIELD_LIST
-#undef X
-
   struct Shape_Fn *fn;
+  /* fields */
+  #define X(name, type) type name;
+  SHAPE_FIELD_LIST
+  #undef X
 } Shape;
 
 /* vtable */
 typedef struct Shape_Fn
 {
-  struct Shape_Fn *super; // NULL for root
 #define METHOD(ret, name, ptype) ret (*name)(ptype);
   SHAPE_METHOD_LIST
 #undef METHOD
