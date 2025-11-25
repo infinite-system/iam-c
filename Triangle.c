@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <math.h>
-#include "Triangle.h"
-#include "Rectangle.h"
 #include <string.h>
+
 #include "iam.h"
+#include "Rectangle.h"
+#include "Triangle.h"
+
 /* ---- Implementations ---- */
 
 static double area(Triangle *r)
@@ -48,11 +50,10 @@ static void describe(Triangle *r)
 Triangle_Fn Triangle_fn;
 
 /* class initializer */
-static void Triangle_init(void)
+void Triangle_init(void)
 {
     INHERIT_METHODS(Triangle_fn, Rectangle_fn); // auto copy
 
-    Triangle_fn.super = &Rectangle_fn;
     /* overrides */
     Triangle_fn.area = area;         // override
     Triangle_fn.describe = describe; // override

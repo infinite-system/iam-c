@@ -11,6 +11,8 @@
     "limits": "c",
     "ratio": "c",
     "variant": "c",
-    "bitset": "c"
+    "bitset": "c",
+    "rectangle.h": "c",
+    "triangle.h": "c"
   }
 }

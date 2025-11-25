@@ -1,7 +1,15 @@
 #ifndef RECTANGLE_H
 #define RECTANGLE_H
 
+#include "iam.h"
 #include "Shape.h"
+
+void Rectangle_init(void);
+
+__attribute__((constructor)) static void register_Rectangle(void)
+{
+  iam_register(Rectangle_init);
+}
 
 #define RECTANGLE_ONLY_FIELD_LIST \
   X(multiplier, double)
@@ -9,8 +17,8 @@
   SHAPE_FIELD_LIST           \
   RECTANGLE_ONLY_FIELD_LIST
 
-#define RECTANGLE_ONLY_METHOD_LIST        \
-  METHOD(double, scaledArea) \
+#define RECTANGLE_ONLY_METHOD_LIST \
+  METHOD(double, scaledArea)       \
   METHOD(double, diagonal)
 #define RECTANGLE_METHOD_LIST \
   SHAPE_METHOD_LIST           \
@@ -31,7 +39,6 @@ typedef struct Rectangle
 /* Rectangle vtable */
 struct Rectangle_Fn
 {
-  void *super; /* placeholder for inheritance */
 #define METHOD(ret, name) ret (*name)(Rectangle *);
   RECTANGLE_METHOD_LIST
 #undef METHOD

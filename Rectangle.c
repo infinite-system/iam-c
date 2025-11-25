@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
+
+#include "iam.h"
+
 #include "Shape.h"
 #include "Rectangle.h"
-#include <string.h>
-#include "iam.h"
 /* ---- Implementations ---- */
 
 static double area(Rectangle *r)
@@ -34,11 +36,10 @@ static void describe(Rectangle *r)
 Rectangle_Fn Rectangle_fn;
 
 /* class initializer */
-static void Rectangle_init(void)
+void Rectangle_init(void)
 {
   INHERIT_METHODS(Rectangle_fn, Shape_fn); // auto copy
 
-  Rectangle_fn.super = &Shape_fn;
   /* overrides */
   Rectangle_fn.area = area;         // override
   Rectangle_fn.describe = describe; // override
@@ -49,10 +50,10 @@ static void Rectangle_init(void)
 }
 
 /* auto-run before main */
-__attribute__((constructor)) static void Rectangle_auto(void)
-{
-  Rectangle_init();
-}
+// __attribute__((constructor)) static void Rectangle_auto(void)
+// {
+//   Rectangle_init();
+// }
 
 /* ctor */
 Rectangle *Rectangle_new()

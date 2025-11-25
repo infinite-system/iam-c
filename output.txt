@@ -5,12 +5,17 @@ Filename: iam.h
 
 #include <stdlib.h>
 
+typedef void (*InitFn)(void);
+
+void iam_register(InitFn fn);
+void iam_boot(void);
+
 /* Allocate */
 #define NEW(T) (T*)malloc(sizeof(T))
 
 /* SUPER(r, area) */
 #define SUPER(PARENT, self, METHOD) \
-    (((PARENT##_Fn*)PARENT##_fn)->METHOD((void*)(self)))
+    PARENT##_fn.METHOD((void*)(self))
     
 #define INHERIT_METHODS(child_fn, parent_fn) \
     memcpy(&(child_fn), &(parent_fn), sizeof(parent_fn));
@@ -20,13 +25,15 @@ Filename: iam.h
 
 Filename: main.c
 ----------------------------------------
+#include <stdio.h>
+
 #include "Shape.h"
 #include "Rectangle.h"
 #include "Triangle.h"
-#include <stdio.h>
 
 int main()
 {
+    iam_boot();
     Triangle *t = Triangle_new();
     t->w = 10;
     t->h = 5;
@@ -50,6 +57,13 @@ int main()
     // printf("[Rectangle] area=%.2f\n", r->fn->area(r));
 
 
+    Triangle *t2 = Triangle_new();
+    t2->w = 3;
+    t2->h = 5;
+    t2->sideLength = 6;
+    t2->multiplier = 3;
+
+    t2->fn->describe(t2);
     return 0;
 }-e 
 
@@ -58,16 +72,18 @@ Filename: Rectangle.c
 ----------------------------------------
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
+
+#include "iam.h"
+
 #include "Shape.h"
 #include "Rectangle.h"
-#include <string.h>
-#include "iam.h"
 /* ---- Implementations ---- */
 
 static double area(Rectangle *r)
 {
   printf("[Rectangle.area] called\n");
-  double base = Shape_fn.area((Shape*)r);
+  double base = SUPER(Shape, r, area);
   printf("[Rectangle.area] base=%.2f\n", base);
   return base * r->multiplier * 3;
 }
@@ -96,7 +112,6 @@ static void Rectangle_init(void)
 {
   INHERIT_METHODS(Rectangle_fn, Shape_fn); // auto copy
 
-  Rectangle_fn.super = &Shape_fn;
   /* overrides */
   Rectangle_fn.area = area;         // override
   Rectangle_fn.describe = describe; // override
@@ -107,10 +122,10 @@ static void Rectangle_init(void)
 }
 
 /* auto-run before main */
-__attribute__((constructor)) static void Rectangle_auto(void)
-{
-  Rectangle_init();
-}
+// __attribute__((constructor)) static void Rectangle_auto(void)
+// {
+//   Rectangle_init();
+// }
 
 /* ctor */
 Rectangle *Rectangle_new()
@@ -127,7 +142,15 @@ Filename: Rectangle.h
 #ifndef RECTANGLE_H
 #define RECTANGLE_H
 
+#include "iam.h"
 #include "Shape.h"
+
+static void Rectangle_init(void);
+
+__attribute__((constructor)) static void register_Rectangle(void)
+{
+  iam_register(Rectangle_init);
+}
 
 #define RECTANGLE_ONLY_FIELD_LIST \
   X(multiplier, double)
@@ -135,8 +158,8 @@ Filename: Rectangle.h
   SHAPE_FIELD_LIST           \
   RECTANGLE_ONLY_FIELD_LIST
 
-#define RECTANGLE_ONLY_METHOD_LIST        \
-  METHOD(double, scaledArea) \
+#define RECTANGLE_ONLY_METHOD_LIST \
+  METHOD(double, scaledArea)       \
   METHOD(double, diagonal)
 #define RECTANGLE_METHOD_LIST \
   SHAPE_METHOD_LIST           \
@@ -157,7 +180,6 @@ typedef struct Rectangle
 /* Rectangle vtable */
 struct Rectangle_Fn
 {
-  void *super; /* placeholder for inheritance */
 #define METHOD(ret, name) ret (*name)(Rectangle *);
   RECTANGLE_METHOD_LIST
 #undef METHOD
@@ -179,21 +201,21 @@ Filename: Shape.c
 
 static double area(Shape *s)
 {
-    double base = s->w * s->h * 3;
-    printf("[Shape.area] w=%.2f h=%.2f base=%.2f\n", s->w, s->h, base);
-    return base;
+  double base = s->w * s->h * 3;
+  printf("[Shape.area] w=%.2f h=%.2f base=%.2f\n", s->w, s->h, base);
+  return base;
 }
 
 static double perimeter(Shape *s)
 {
-    return 2 * (s->w + s->h);
+  return 2 * (s->w + s->h);
 }
 
 static void describe(Shape *s)
 {
-    printf("[Shape] w=%.2f h=%.2f area=%.2f\n",
-           s->w, s->h, area(s));
-} 
+  printf("[Shape] w=%.2f h=%.2f area=%.2f\n",
+         s->w, s->h, area(s));
+}
 
 /* ---- vtable ---- */
 
@@ -202,26 +224,25 @@ Shape_Fn Shape_fn;
 /* class initializer */
 static void Shape_init(void)
 {
-    Shape_fn.area      = area;
-    Shape_fn.perimeter = perimeter;
-    Shape_fn.describe  = describe;
+  Shape_fn.area = area;
+  Shape_fn.perimeter = perimeter;
+  Shape_fn.describe = describe;
 }
 
 /* auto-run BEFORE main() */
-__attribute__((constructor))
-static void Shape_auto(void) {
-    Shape_init();
-}
-
+// __attribute__((constructor)) static void Shape_auto(void)
+// {
+//   Shape_init();
+// }
 
 /* ---- constructor ---- */
 
 Shape *Shape_new()
 {
-    Shape *s = NEW(Shape);
-    s->fn = &Shape_fn;
+  Shape *s = NEW(Shape);
+  s->fn = &Shape_fn;
 
-    return s;
+  return s;
 }-e 
 
 
@@ -232,13 +253,20 @@ Filename: Shape.h
 
 #include "iam.h"
 
+static void Shape_init(void);
+
+__attribute__((constructor)) static void register_Shape(void)
+{
+  iam_register(Shape_init);
+}
+
 /* X-macro field lists */
 #define SHAPE_FIELD_LIST \
   X(w, double)           \
   X(h, double)
 
 /* X-macro method lists */
-#define SHAPE_METHOD_LIST            \
+#define SHAPE_METHOD_LIST   \
   METHOD(double, area)      \
   METHOD(double, perimeter) \
   METHOD(void, describe)
@@ -247,10 +275,10 @@ Filename: Shape.h
 typedef struct Shape
 {
   struct Shape_Fn *fn;
-  /* fields */
-  #define X(name, type) type name;
+/* fields */
+#define X(name, type) type name;
   SHAPE_FIELD_LIST
-  #undef X
+#undef X
 } Shape;
 
 /* vtable */
@@ -274,19 +302,21 @@ Filename: Triangle.c
 ----------------------------------------
 #include <stdio.h>
 #include <math.h>
-#include "Triangle.h"
-#include "Rectangle.h"
 #include <string.h>
+
 #include "iam.h"
+#include "Rectangle.h"
+#include "Triangle.h"
+
 /* ---- Implementations ---- */
 
 static double area(Triangle *r)
 {
     /* 'super' is stored as void* in the fn table; cast it to Rectangle_Fn* to access area */
     printf("[Triangle.area] called\n");
-    double base = Rectangle_fn.area((Rectangle*)r);
+    double base = SUPER(Rectangle, r, area);
     printf("[Triangle.area] base=%.2f\n", base);
-    return base * r->multiplier * 1;
+    return base * r->multiplier * 2;
 }
 
 static double scaledArea(Triangle *r)
@@ -326,7 +356,6 @@ static void Triangle_init(void)
 {
     INHERIT_METHODS(Triangle_fn, Rectangle_fn); // auto copy
 
-    Triangle_fn.super = &Rectangle_fn;
     /* overrides */
     Triangle_fn.area = area;         // override
     Triangle_fn.describe = describe; // override
@@ -359,8 +388,8 @@ Filename: Triangle.h
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 
+#include "iam.h"
 #include "Rectangle.h"
-#include "Shape.h"
 
 #define TRIANGLE_ONLY_FIELD_LIST \
   X(sideLength, double)
@@ -392,7 +421,6 @@ struct Triangle
 /* Triangle vtable */
 struct Triangle_Fn
 {
-  void *super;
   #define METHOD(ret, name) ret (*name)(Triangle *);
   TRIANGLE_METHOD_LIST
   #undef METHOD

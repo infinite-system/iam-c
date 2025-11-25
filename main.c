@@ -1,10 +1,12 @@
+#include <stdio.h>
+
 #include "Shape.h"
 #include "Rectangle.h"
 #include "Triangle.h"
-#include <stdio.h>
 
 int main()
 {
+    iam_boot();
     Triangle *t = Triangle_new();
     t->w = 10;
     t->h = 5;
@@ -12,12 +14,15 @@ int main()
     t->multiplier = 3;
 
     t->fn->describe(t);
+
+    // printf("----\n");
     // Shape *s = Shape_new();
     // s->w = 4;
     // s->h = 3;
 
     // s->fn->describe(s);
 
+    // printf("----\n");
     // Rectangle *r = Rectangle_new();
     // r->w = 10;
     // r->h = 5;
@@ -27,6 +32,14 @@ int main()
     // printf("[Rectangle] perimeter=%.2f\n", r->fn->perimeter(r));
     // printf("[Rectangle] area=%.2f\n", r->fn->area(r));
 
+    printf("----\n");
 
+    Triangle *t2 = Triangle_new();
+    t2->w = 3;
+    t2->h = 5;
+    t2->sideLength = 6;
+    t2->multiplier = 3;
+
+    t2->fn->describe(t2);
     return 0;
 }

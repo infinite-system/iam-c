@@ -3,6 +3,11 @@
 
 #include <stdlib.h>
 
+typedef void (*InitFn)(void);
+
+void iam_register(InitFn fn);
+void iam_boot(void);
+
 /* Allocate */
 #define NEW(T) (T*)malloc(sizeof(T))
 
