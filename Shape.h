@@ -34,8 +34,8 @@ typedef struct Shape
 /* vtable */
 typedef struct Shape_Fn
 {
-#define METHOD(ret, name) ret (*name)(Shape *);
-  SHAPE_METHOD_LIST
+#define METHOD(ret, name, ...) ret (*name)(Shape*, ##__VA_ARGS__);
+    SHAPE_METHOD_LIST
 #undef METHOD
 } Shape_Fn;
 

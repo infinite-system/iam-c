@@ -2,25 +2,30 @@
 #define TRIANGLE_H
 
 #include "iam.h"
+#include "AreaByHeightSide.h"
 #include "Rectangle.h"
 
 void Triangle_init(void);
 
-__attribute__((constructor)) static void register_Triangle(void)
+__attribute__((constructor)) 
+static void register_Triangle(void)
 {
   iam_register(Triangle_init);
 }
 
 #define TRIANGLE_ONLY_FIELD_LIST \
-  X(sideLength, double)
+  X(sideLength, double) 
 
 #define TRIANGLE_FIELD_LIST \
   RECTANGLE_FIELD_LIST      \
   TRIANGLE_ONLY_FIELD_LIST;
 
 #define TRIANGLE_ONLY_METHOD_LIST \
-  METHOD(double, sideArea)        \
-  METHOD(double, rightAngle);
+  METHOD(double, rightAngle) \
+  METHOD(double, sideArea) \
+  METHOD(double, sideArea2) \
+  METHOD(double, getHeight) \
+  METHOD(double, getSide)
 
 #define TRIANGLE_METHOD_LIST \
   RECTANGLE_METHOD_LIST      \
@@ -41,9 +46,10 @@ struct Triangle
 /* Triangle vtable */
 struct Triangle_Fn
 {
-#define METHOD(ret, name) ret (*name)(Triangle *);
-  TRIANGLE_METHOD_LIST
+#define METHOD(ret, name, ...) ret (*name)(Triangle*, ##__VA_ARGS__);
+    TRIANGLE_METHOD_LIST
 #undef METHOD
+  AreaBySideHeight_Adapter AreaBySideHeight;
 };
 
 extern Triangle_Fn Triangle_fn;

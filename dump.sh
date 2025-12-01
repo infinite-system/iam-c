@@ -16,7 +16,7 @@ for f in *; do
 
     # Skip exclusions
     case "$f" in
-        "$SELF" | "Makefile" | "iam_test" | "iam.c" | "$OUT")
+        "$SELF" | "Makefile" | "iam_test" | "$OUT")
             continue
         ;;
     esac
@@ -25,7 +25,7 @@ for f in *; do
     echo "Filename: $f" >> "$OUT"
     echo "----------------------------------------" >> "$OUT"
     cat "$f" >> "$OUT"
-    echo -e "\n\n" >> "$OUT"
+    echo "\n\n" >> "$OUT"
 done
 
 echo "Done. Output saved to $OUT."

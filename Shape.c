@@ -33,12 +33,6 @@ void Shape_init(void)
   Shape_fn.describe = describe;
 }
 
-/* auto-run BEFORE main() */
-// __attribute__((constructor)) static void Shape_auto(void)
-// {
-//   Shape_init();
-// }
-
 /* ---- constructor ---- */
 
 Shape *Shape_new()

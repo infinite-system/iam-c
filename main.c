@@ -9,11 +9,12 @@ int main()
     iam_boot();
     Triangle *t = Triangle_new();
     t->w = 10;
-    t->h = 5;
+    t->h = 51;
     t->sideLength = 6;
     t->multiplier = 3;
 
     t->fn->describe(t);
+    t->fn->parentMethod(t, 42.0);
 
     // printf("----\n");
     // Shape *s = Shape_new();
@@ -36,7 +37,7 @@ int main()
 
     Triangle *t2 = Triangle_new();
     t2->w = 3;
-    t2->h = 5;
+    t2->h = 3;
     t2->sideLength = 6;
     t2->multiplier = 3;
 

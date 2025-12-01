@@ -11,7 +11,7 @@
 static double area(Rectangle *r)
 {
   printf("[Rectangle.area] called\n");
-  double base = SUPER(Shape, r, area);
+  double base = Shape_fn.area((Shape*)r);
   printf("[Rectangle.area] base=%.2f\n", base);
   return base * r->multiplier * 3;
 }
@@ -33,6 +33,11 @@ static void describe(Rectangle *r)
          diagonal(r));
 }
 
+static void parentMethod(Rectangle *r, double x)
+{
+    printf("[Rectangle.parentMethod] called with x=%.2f\n", x);
+}
+
 Rectangle_Fn Rectangle_fn;
 
 /* class initializer */
@@ -47,13 +52,8 @@ void Rectangle_init(void)
   /* child only */
   Rectangle_fn.scaledArea = scaledArea;
   Rectangle_fn.diagonal = diagonal;
+  Rectangle_fn.parentMethod = parentMethod;
 }
-
-/* auto-run before main */
-// __attribute__((constructor)) static void Rectangle_auto(void)
-// {
-//   Rectangle_init();
-// }
 
 /* ctor */
 Rectangle *Rectangle_new()
