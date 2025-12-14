@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "iam.h"
 #include "Shape.h"
 #include "Rectangle.h"
 #include "Triangle.h"

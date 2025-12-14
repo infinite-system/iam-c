@@ -1,0 +1,32 @@
+BasedOnStyle: LLVM
+Language: C
+
+# ---- Braces ----
+BreakBeforeBraces: Attach
+
+BraceWrapping:
+  AfterFunction: false
+  AfterStruct: false
+  AfterEnum: false
+  AfterUnion: false
+  AfterExternBlock: false
+  BeforeElse: false
+  BeforeCatch: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+
+# ---- Prevent this: "};" on same line ----
+AllowShortBlocksOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: None
+
+# ---- Initializers ----
+BinPackArguments: false
+BinPackParameters: false
+Cpp11BracedListStyle: false
+
+# ---- General sanity ----
+ColumnLimit: 0
+IndentWidth: 2
+TabWidth: 2
+UseTab: Never

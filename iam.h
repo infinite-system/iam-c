@@ -3,15 +3,75 @@
 
 #include <stdlib.h>
 
-typedef void (*InitFn)(void);
+/* === MEMORY MACRO === */
 
-void iam_register(InitFn fn);
-void iam_boot(void);
+#define NEW(T) (T *)malloc(sizeof(T))
 
-/* Allocate */
-#define NEW(T) (T*)malloc(sizeof(T))
-    
+/* === INHERITANCE MACRO === */
+
 #define INHERIT_METHODS_FROM(parent_fn, child_fn) \
-    memcpy(&(child_fn), &(parent_fn), sizeof(parent_fn));
+  memcpy(&(child_fn), &(parent_fn), sizeof(parent_fn));
+
+/* === FIELD MACROS === */
+
+#define X_FIELD(name, type) type name;
+#define X_ARRAY(name, type, size) type name[size];
+#define X_FLEX(name, type) type name[];
+#define X_BITS(name, type, bits) type name : bits;
+
+/* === CLASS REGISTRY === */
+
+typedef void (*InitRegistry)(void);
+
+/* === FIELDS === */
+
+#define IAM_FIELD_LIST              \
+  X_FIELD(registry, InitRegistry *) \
+  X_FIELD(registry_count, size_t)   \
+  X_FIELD(registry_cap, size_t)
+
+#define IAM_METHOD_LIST                    \
+  METHOD(void, registerInit, InitRegistry) \
+  METHOD(void, boot)
+
+typedef struct IAM {
+  struct IAM_Fn *fn;
+#define X_FIELD(name, type) type name;
+  IAM_FIELD_LIST
+#undef X_FIELD
+} IAM;
+
+typedef struct IAM_Fn {
+#define METHOD(ret, name, ...) ret (*name)(IAM * self, ##__VA_ARGS__);
+  IAM_METHOD_LIST
+#undef METHOD
+} IAM_Fn;
+
+extern IAM_Fn IAM_fn;
+
+/* === STATICS === */
+
+#define IAM_STATIC_METHOD_LIST             \
+  METHOD(IAM *, getDefaultInstance)        \
+  METHOD(int, getDefaultRegistryCap)       \
+  METHOD(void, registerInit, InitRegistry) \
+  METHOD(void, boot)
+
+typedef struct IAM_Static_Fn {
+#define METHOD(ret, name, ...) ret (*name)(__VA_ARGS__);
+  IAM_STATIC_METHOD_LIST
+#undef METHOD
+} IAM_Static_Fn;
+
+extern IAM_Static_Fn IAM_static;
+
+/* === CONSTRUCTOR === */
+
+IAM *IAM_new(size_t registry_cap);
+
+/* === GLOBAL WORLD HELPERS === */
+
+void iam_register(InitRegistry fn);
+void iam_boot(void);
 
 #endif

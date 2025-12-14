@@ -1,4 +1,18 @@
-{
+{ 
+  "editor.detectIndentation": false,
+  // C / C++ specific (important)
+  "[c]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+  "[cpp]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+  "editor.formatOnSave": true,
+  "C_Cpp.codeAnalysis.runAutomatically": true,
+  "C_Cpp.codeAnalysis.clangTidy.enabled": true,
+  "C_Cpp.codeAnalysis.clangTidy.config": "",
   "files.associations": {
     "*.dbclient-js": "javascript",
     "*.embeddedhtml": "html",
