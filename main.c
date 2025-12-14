@@ -16,12 +16,12 @@ int main()
     t->fn->describe(t);
     t->fn->parentMethod(t, 42.0);
 
-    // printf("----\n");
-    // Shape *s = Shape_new();
-    // s->w = 4;
-    // s->h = 3;
+    printf("----\n");
+    Shape *s = Shape_new();
+    s->w = 4;
+    s->h = 3;
 
-    // s->fn->describe(s);
+    s->fn->describe(s);
 
     // printf("----\n");
     // Rectangle *r = Rectangle_new();

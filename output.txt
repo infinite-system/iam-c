@@ -20,7 +20,7 @@ static double sideArea2(void *self, const AreaBySideHeight_Adapter *fn)
 AreaBySideHeight_Fn AreaBySideHeight_fn;
 
 /* Mixin initializer */
-void AreaBySideHeight_init(void)
+void AreaBySideHeight_prototype(void)
 {
   AreaBySideHeight_fn.sideArea = sideArea;
   AreaBySideHeight_fn.sideArea2 = sideArea2;
@@ -35,11 +35,11 @@ Filename: AreaByHeightSide.h
 
 #include "iam.h"
 
-void AreaBySideHeight_init(void);
+void AreaBySideHeight_prototype(void);
 
 __attribute__((constructor)) static void register_AreaBySideHeight(void)
 {
-  iam_register(AreaBySideHeight_init);
+  iam_register(AreaBySideHeight_prototype);
 }
 
 #define AREA_BY_SIDE_HEIGHT_ADAPTER_METHOD_LIST \
@@ -105,7 +105,7 @@ void iam_boot(void);
 /* Allocate */
 #define NEW(T) (T*)malloc(sizeof(T))
     
-#define INHERIT_METHODS(child_fn, parent_fn) \
+#define INHERIT_METHODS_FROM(parent_fn, child_fn) \
     memcpy(&(child_fn), &(parent_fn), sizeof(parent_fn));
 
 #endif
@@ -131,12 +131,12 @@ int main()
     t->fn->describe(t);
     t->fn->parentMethod(t, 42.0);
 
-    // printf("----\n");
-    // Shape *s = Shape_new();
-    // s->w = 4;
-    // s->h = 3;
+    printf("----\n");
+    Shape *s = Shape_new();
+    s->w = 4;
+    s->h = 3;
 
-    // s->fn->describe(s);
+    s->fn->describe(s);
 
     // printf("----\n");
     // Rectangle *r = Rectangle_new();
@@ -171,14 +171,22 @@ Filename: Rectangle.c
 
 #include "Shape.h"
 #include "Rectangle.h"
-/* ---- Implementations ---- */
+
+/* === PRIVATE METHODS === */
+
+static double _privateMethod(Rectangle *r)
+{
+  return r->w * r->h * r->multiplier * 42;
+}
+
+/* === PUBLIC METHODS === */
 
 static double area(Rectangle *r)
 {
   printf("[Rectangle.area] called\n");
-  double base = Shape_fn.area((Shape*)r);
+  double base = Shape_fn.area((Shape *)r);
   printf("[Rectangle.area] base=%.2f\n", base);
-  return base * r->multiplier * 3;
+  return base * r->multiplier * 3 * r->fn->_privateMethod(r);
 }
 
 static double scaledArea(Rectangle *r)
@@ -200,24 +208,34 @@ static void describe(Rectangle *r)
 
 static void parentMethod(Rectangle *r, double x)
 {
-    printf("[Rectangle.parentMethod] called with x=%.2f\n", x);
+  printf("[Rectangle.parentMethod] called with x=%.2f\n", x);
 }
 
 Rectangle_Fn Rectangle_fn;
 
+#define Rectangle_PRIVATE_METHODS \
+  X(_privateMethod)
+
+#define Rectangle_PUBLIC_METHODS \
+  /* Core geometry */            \
+  X(area)                        \
+  X(describe)                    \
+  X(scaledArea)                  \
+  X(diagonal)                    \
+  X(parentMethod)
+
+#define Rectangle_IMPLEMENTED_METHODS \
+  Rectangle_PRIVATE_METHODS           \
+  Rectangle_PUBLIC_METHODS
+
 /* class initializer */
-void Rectangle_init(void)
+void Rectangle_prototype(void)
 {
-  INHERIT_METHODS(Rectangle_fn, Shape_fn); // auto copy
+  INHERIT_METHODS_FROM(Shape_fn, Rectangle_fn); // auto copy
 
-  /* overrides */
-  Rectangle_fn.area = area;         // override
-  Rectangle_fn.describe = describe; // override
-
-  /* child only */
-  Rectangle_fn.scaledArea = scaledArea;
-  Rectangle_fn.diagonal = diagonal;
-  Rectangle_fn.parentMethod = parentMethod;
+#define X(name) Rectangle_fn.name = name;
+  Rectangle_IMPLEMENTED_METHODS
+#undef X
 }
 
 /* ctor */
@@ -232,52 +250,50 @@ Rectangle *Rectangle_new()
 
 Filename: Rectangle.h
 ----------------------------------------
-#ifndef RECTANGLE_H
-#define RECTANGLE_H
+#ifndef Rectangle_H
+#define Rectangle_H
 
 #include "iam.h"
 #include "Shape.h"
 
-void Rectangle_init(void);
+void Rectangle_prototype(void);
 
 __attribute__((constructor)) static void register_Rectangle(void)
 {
-  iam_register(Rectangle_init);
+  iam_register(Rectangle_prototype);
 }
 
-#define RECTANGLE_ONLY_FIELD_LIST \
+#define Rectangle_ONLY_FIELD_LIST \
   X(multiplier, double)
-#define RECTANGLE_FIELD_LIST \
-  SHAPE_FIELD_LIST           \
-  RECTANGLE_ONLY_FIELD_LIST
+#define Rectangle_FIELD_LIST \
+  Shape_FIELD_LIST           \
+  Rectangle_ONLY_FIELD_LIST
 
-#define RECTANGLE_ONLY_METHOD_LIST \
+#define Rectangle_ONLY_METHOD_LIST \
+  METHOD(double, _privateMethod)   \
   METHOD(double, scaledArea)       \
   METHOD(double, diagonal)         \
   METHOD(void, parentMethod, double)
-#define RECTANGLE_METHOD_LIST \
-  SHAPE_METHOD_LIST           \
-  RECTANGLE_ONLY_METHOD_LIST
-
-typedef struct Rectangle Rectangle;
-typedef struct Rectangle_Fn Rectangle_Fn;
+#define Rectangle_METHOD_LIST \
+  Shape_METHOD_LIST           \
+  Rectangle_ONLY_METHOD_LIST
 
 /* Child struct */
 typedef struct Rectangle
 {
   struct Rectangle_Fn *fn; /* own vtable */
 #define X(name, type) type name;
-  RECTANGLE_FIELD_LIST
+  Rectangle_FIELD_LIST
 #undef X
 } Rectangle;
 
 /* Rectangle vtable */
-struct Rectangle_Fn
+typedef struct Rectangle_Fn
 {
-#define METHOD(ret, name, ...) ret (*name)(Rectangle*, ##__VA_ARGS__);
-    RECTANGLE_METHOD_LIST
+#define METHOD(ret, name, ...) ret (*name)(Rectangle *, ##__VA_ARGS__);
+  Rectangle_METHOD_LIST
 #undef METHOD
-};
+} Rectangle_Fn;
 
 extern Rectangle_Fn Rectangle_fn;
 
@@ -311,19 +327,24 @@ static void describe(Shape *s)
          s->w, s->h, area(s));
 }
 
-/* ---- vtable ---- */
-
 Shape_Fn Shape_fn;
 
-/* class initializer */
-void Shape_init(void)
-{
-  Shape_fn.area = area;
-  Shape_fn.perimeter = perimeter;
-  Shape_fn.describe = describe;
-}
+#define Shape_PUBLIC_METHODS \
+  /* Core geometry */        \
+  X(area)                    \
+  X(describe)                \
+  X(perimeter)
 
-/* ---- constructor ---- */
+#define Shape_IMPLEMENTED_METHODS \
+  Shape_PUBLIC_METHODS
+
+/* Class prototype */
+void Shape_prototype(void)
+{
+#define X(name) Shape_fn.name = name;
+  Shape_IMPLEMENTED_METHODS
+#undef X
+}
 
 Shape *Shape_new()
 {
@@ -336,25 +357,25 @@ Shape *Shape_new()
 
 Filename: Shape.h
 ----------------------------------------
-#ifndef SHAPE_H
-#define SHAPE_H
+#ifndef Shape_H
+#define Shape_H
 
 #include "iam.h"
 
-void Shape_init(void);
+void Shape_prototype(void);
 
 __attribute__((constructor)) static void register_Shape(void)
 {
-  iam_register(Shape_init);
+  iam_register(Shape_prototype);
 }
 
 /* X-macro field lists */
-#define SHAPE_FIELD_LIST \
+#define Shape_FIELD_LIST \
   X(w, double)           \
   X(h, double)
 
 /* X-macro method lists */
-#define SHAPE_METHOD_LIST   \
+#define Shape_METHOD_LIST   \
   METHOD(double, area)      \
   METHOD(double, perimeter) \
   METHOD(void, describe)
@@ -365,7 +386,7 @@ typedef struct Shape
   struct Shape_Fn *fn;
 /* fields */
 #define X(name, type) type name;
-  SHAPE_FIELD_LIST
+  Shape_FIELD_LIST
 #undef X
 } Shape;
 
@@ -373,7 +394,7 @@ typedef struct Shape
 typedef struct Shape_Fn
 {
 #define METHOD(ret, name, ...) ret (*name)(Shape*, ##__VA_ARGS__);
-    SHAPE_METHOD_LIST
+    Shape_METHOD_LIST
 #undef METHOD
 } Shape_Fn;
 
@@ -397,7 +418,24 @@ Filename: Triangle.c
 #include "Rectangle.h"
 #include "Triangle.h"
 
-/* ---- Implementations ---- */
+/* === PRIVATE METHODS === */
+
+static double _calculateComplex(Triangle *r)
+{
+    return r->w * r->multiplier + r->fn->diagonal(r) * r->w;
+}
+
+static double _calculateAreaIntense(Triangle *r)
+{
+    return r->h * r->multiplier + r->fn->diagonal(r) * 5;
+}
+
+static double _calculateAreaAlt(Triangle *r)
+{
+    return r->h * r->multiplier + r->fn->diagonal(r);
+}
+
+/* === PUBLIC METHODS === */
 
 static double area(Triangle *r)
 {
@@ -406,7 +444,7 @@ static double area(Triangle *r)
     printf("[Triangle.area] called\n");
     double base = Rectangle_fn.area((Rectangle *)r);
     printf("[Triangle.area] base=%.2f\n", base);
-    return base * r->multiplier * 2 * r->fn->diagonal(r);
+    return base * r->multiplier * 2 * r->fn->diagonal(r) * r->fn->_calculateComplex(r);
 }
 
 static double scaledArea(Triangle *r)
@@ -445,44 +483,50 @@ static void describe(Triangle *r)
            r->fn->rightAngle(r));
 }
 
-static double getHeight(Triangle *r)
+/* AreaBySideHeight Adapter methods */
+
+static double getHeight(void *r)
 {
-    return r->h;
+    return ((Triangle *)r)->h;
 }
 
-static double getSide(Triangle *r)
+static double getSide(void *r)
 {
-    return r->sideLength;
+    return ((Triangle *)r)->sideLength;
 }
 
 Triangle_Fn Triangle_fn;
 
-#define TRIANGLE_IMPLEMENTED                \
-    /* Core geometry */                     \
-    X(area)                                 \
-    X(describe)                             \
-    X(rightAngle)                           \
-    X(sideArea)                             \
-    X(sideArea2)                            \
-    X(scaledArea)                           \
-    X(diagonal)                             \
-    /* AreaBySideHeight Adapter contract */ \
-    X(getHeight)                            \
-    X(getSide)
+#define Triangle_PRIVATE_METHODS \
+    X(_calculateComplex)         \
+    X(_calculateAreaIntense)     \
+    X(_calculateAreaAlt)
 
-/* class initializer */
-void Triangle_init(void)
+#define Triangle_PUBLIC_METHODS \
+    /* Core geometry */         \
+    X(area)                     \
+    X(describe)                 \
+    X(rightAngle)               \
+    X(sideArea)                 \
+    X(sideArea2)                \
+    X(scaledArea)               \
+    X(diagonal)
+
+#define Triangle_IMPLEMENTED_METHODS \
+    Triangle_PRIVATE_METHODS         \
+    Triangle_PUBLIC_METHODS
+
+/* class prototype */
+void Triangle_prototype(void)
 {
-    INHERIT_METHODS(Triangle_fn, Rectangle_fn); // auto copy
+    INHERIT_METHODS_FROM(Rectangle_fn, Triangle_fn); // auto copy
 
 #define X(name) Triangle_fn.name = name;
-    TRIANGLE_IMPLEMENTED
+    Triangle_IMPLEMENTED_METHODS
 #undef X
 
-#define METHOD(returnType, name, ...) \
-    Triangle_fn.AreaBySideHeight.name = (void *)name;
-    AREA_BY_SIDE_HEIGHT_ADAPTER_METHOD_LIST
-#undef METHOD
+    Triangle_fn.AreaBySideHeight.getHeight = getHeight;
+    Triangle_fn.AreaBySideHeight.getSide = getSide;
 }
 
 /* ctor */
@@ -497,59 +541,56 @@ Triangle *Triangle_new()
 
 Filename: Triangle.h
 ----------------------------------------
-#ifndef TRIANGLE_H
-#define TRIANGLE_H
+#ifndef Triangle_H
+#define Triangle_H
 
 #include "iam.h"
 #include "AreaByHeightSide.h"
 #include "Rectangle.h"
 
-void Triangle_init(void);
+void Triangle_prototype(void);
 
-__attribute__((constructor)) 
-static void register_Triangle(void)
+__attribute__((constructor)) static void register_Triangle(void)
 {
-  iam_register(Triangle_init);
+  iam_register(Triangle_prototype);
 }
 
-#define TRIANGLE_ONLY_FIELD_LIST \
-  X(sideLength, double) 
+#define Triangle_ONLY_FIELD_LIST \
+  X(sideLength, double)
 
-#define TRIANGLE_FIELD_LIST \
-  RECTANGLE_FIELD_LIST      \
-  TRIANGLE_ONLY_FIELD_LIST;
+#define Triangle_FIELD_LIST \
+  Rectangle_FIELD_LIST      \
+  Triangle_ONLY_FIELD_LIST;
 
-#define TRIANGLE_ONLY_METHOD_LIST \
-  METHOD(double, rightAngle) \
-  METHOD(double, sideArea) \
-  METHOD(double, sideArea2) \
-  METHOD(double, getHeight) \
-  METHOD(double, getSide)
+#define Triangle_ONLY_METHOD_LIST       \
+  METHOD(double, _calculateComplex)     \
+  METHOD(double, _calculateAreaIntense) \
+  METHOD(double, _calculateAreaAlt)     \
+  METHOD(double, rightAngle)            \
+  METHOD(double, sideArea)              \
+  METHOD(double, sideArea2)
 
-#define TRIANGLE_METHOD_LIST \
-  RECTANGLE_METHOD_LIST      \
-  TRIANGLE_ONLY_METHOD_LIST;
-
-typedef struct Triangle Triangle;
-typedef struct Triangle_Fn Triangle_Fn;
+#define Triangle_METHOD_LIST \
+  Rectangle_METHOD_LIST      \
+  Triangle_ONLY_METHOD_LIST;
 
 /* Child struct */
-struct Triangle
+typedef struct Triangle
 {
   struct Triangle_Fn *fn; /* own vtable */
 #define X(name, type) type name;
-  TRIANGLE_FIELD_LIST
+  Triangle_FIELD_LIST
 #undef X
-};
+} Triangle;
 
 /* Triangle vtable */
-struct Triangle_Fn
+typedef struct Triangle_Fn
 {
-#define METHOD(ret, name, ...) ret (*name)(Triangle*, ##__VA_ARGS__);
-    TRIANGLE_METHOD_LIST
+#define METHOD(ret, name, ...) ret (*name)(Triangle *, ##__VA_ARGS__);
+  Triangle_METHOD_LIST
 #undef METHOD
   AreaBySideHeight_Adapter AreaBySideHeight;
-};
+} Triangle_Fn;
 
 extern Triangle_Fn Triangle_fn;
 

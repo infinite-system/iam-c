@@ -11,7 +11,7 @@ void iam_boot(void);
 /* Allocate */
 #define NEW(T) (T*)malloc(sizeof(T))
     
-#define INHERIT_METHODS(child_fn, parent_fn) \
+#define INHERIT_METHODS_FROM(parent_fn, child_fn) \
     memcpy(&(child_fn), &(parent_fn), sizeof(parent_fn));
 
 #endif

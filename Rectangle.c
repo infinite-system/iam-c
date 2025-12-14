@@ -6,14 +6,22 @@
 
 #include "Shape.h"
 #include "Rectangle.h"
-/* ---- Implementations ---- */
+
+/* === PRIVATE METHODS === */
+
+static double _privateMethod(Rectangle *r)
+{
+  return r->w * r->h * r->multiplier * 42;
+}
+
+/* === PUBLIC METHODS === */
 
 static double area(Rectangle *r)
 {
   printf("[Rectangle.area] called\n");
-  double base = Shape_fn.area((Shape*)r);
+  double base = Shape_fn.area((Shape *)r);
   printf("[Rectangle.area] base=%.2f\n", base);
-  return base * r->multiplier * 3;
+  return base * r->multiplier * 3 * r->fn->_privateMethod(r);
 }
 
 static double scaledArea(Rectangle *r)
@@ -35,24 +43,34 @@ static void describe(Rectangle *r)
 
 static void parentMethod(Rectangle *r, double x)
 {
-    printf("[Rectangle.parentMethod] called with x=%.2f\n", x);
+  printf("[Rectangle.parentMethod] called with x=%.2f\n", x);
 }
 
 Rectangle_Fn Rectangle_fn;
 
+#define Rectangle_PRIVATE_METHODS \
+  X(_privateMethod)
+
+#define Rectangle_PUBLIC_METHODS \
+  /* Core geometry */            \
+  X(area)                        \
+  X(describe)                    \
+  X(scaledArea)                  \
+  X(diagonal)                    \
+  X(parentMethod)
+
+#define Rectangle_IMPLEMENTED_METHODS \
+  Rectangle_PRIVATE_METHODS           \
+  Rectangle_PUBLIC_METHODS
+
 /* class initializer */
-void Rectangle_init(void)
+void Rectangle_prototype(void)
 {
-  INHERIT_METHODS(Rectangle_fn, Shape_fn); // auto copy
+  INHERIT_METHODS_FROM(Shape_fn, Rectangle_fn); // auto copy
 
-  /* overrides */
-  Rectangle_fn.area = area;         // override
-  Rectangle_fn.describe = describe; // override
-
-  /* child only */
-  Rectangle_fn.scaledArea = scaledArea;
-  Rectangle_fn.diagonal = diagonal;
-  Rectangle_fn.parentMethod = parentMethod;
+#define X(name) Rectangle_fn.name = name;
+  Rectangle_IMPLEMENTED_METHODS
+#undef X
 }
 
 /* ctor */

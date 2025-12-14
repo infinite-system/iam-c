@@ -7,7 +7,24 @@
 #include "Rectangle.h"
 #include "Triangle.h"
 
-/* ---- Implementations ---- */
+/* === PRIVATE METHODS === */
+
+static double _calculateComplex(Triangle *r)
+{
+    return r->w * r->multiplier + r->fn->diagonal(r) * r->w;
+}
+
+static double _calculateAreaIntense(Triangle *r)
+{
+    return r->h * r->multiplier + r->fn->diagonal(r) * 5;
+}
+
+static double _calculateAreaAlt(Triangle *r)
+{
+    return r->h * r->multiplier + r->fn->diagonal(r);
+}
+
+/* === PUBLIC METHODS === */
 
 static double area(Triangle *r)
 {
@@ -16,7 +33,7 @@ static double area(Triangle *r)
     printf("[Triangle.area] called\n");
     double base = Rectangle_fn.area((Rectangle *)r);
     printf("[Triangle.area] base=%.2f\n", base);
-    return base * r->multiplier * 2 * r->fn->diagonal(r);
+    return base * r->multiplier * 2 * r->fn->diagonal(r) * r->fn->_calculateComplex(r);
 }
 
 static double scaledArea(Triangle *r)
@@ -55,44 +72,56 @@ static void describe(Triangle *r)
            r->fn->rightAngle(r));
 }
 
-static double getHeight(Triangle *r)
+/* AreaBySideHeight Adapter methods */
+
+static double getHeight(void *r)
 {
-    return r->h;
+    return ((Triangle *)r)->h;
 }
 
-static double getSide(Triangle *r)
+static double getSide(void *r)
 {
-    return r->sideLength;
+    return ((Triangle *)r)->sideLength;
 }
 
 Triangle_Fn Triangle_fn;
 
-#define TRIANGLE_IMPLEMENTED                \
-    /* Core geometry */                     \
-    X(area)                                 \
-    X(describe)                             \
-    X(rightAngle)                           \
-    X(sideArea)                             \
-    X(sideArea2)                            \
-    X(scaledArea)                           \
-    X(diagonal)                             \
-    /* AreaBySideHeight Adapter contract */ \
-    X(getHeight)                            \
+#define Triangle_PRIVATE_METHODS \
+    X(_calculateComplex)         \
+    X(_calculateAreaIntense)     \
+    X(_calculateAreaAlt)
+
+#define Triangle_PUBLIC_METHODS \
+    /* Core geometry */         \
+    X(area)                     \
+    X(describe)                 \
+    X(rightAngle)               \
+    X(sideArea)                 \
+    X(sideArea2)                \
+    X(scaledArea)               \
+    X(diagonal)
+
+#define Triangle_IMPLEMENTED_METHODS \
+    Triangle_PRIVATE_METHODS         \
+    Triangle_PUBLIC_METHODS
+
+#define Triangle_AREA_BY_SIDE_HEIGHT_ADAPTER_METHODS \
+    X(getHeight)                                     \
     X(getSide)
 
-/* class initializer */
-void Triangle_init(void)
+/* class prototype */
+void Triangle_prototype(void)
 {
-    INHERIT_METHODS(Triangle_fn, Rectangle_fn); // auto copy
+    INHERIT_METHODS_FROM(Rectangle_fn, Triangle_fn); // auto copy
 
 #define X(name) Triangle_fn.name = name;
-    TRIANGLE_IMPLEMENTED
+    Triangle_IMPLEMENTED_METHODS
 #undef X
 
-#define METHOD(returnType, name, ...) \
-    Triangle_fn.AreaBySideHeight.name = (void *)name;
-    AREA_BY_SIDE_HEIGHT_ADAPTER_METHOD_LIST
-#undef METHOD
+    /* Setup AreaBySideHeight adapter */
+#define X(name) Triangle_fn.AreaBySideHeight.name = name;
+    Triangle_AREA_BY_SIDE_HEIGHT_ADAPTER_METHODS
+#undef X
 }
 
 /* ctor */

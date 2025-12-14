@@ -1,56 +1,53 @@
-#ifndef TRIANGLE_H
-#define TRIANGLE_H
+#ifndef Triangle_H
+#define Triangle_H
 
 #include "iam.h"
 #include "AreaByHeightSide.h"
 #include "Rectangle.h"
 
-void Triangle_init(void);
+void Triangle_prototype(void);
 
-__attribute__((constructor)) 
-static void register_Triangle(void)
+__attribute__((constructor)) static void register_Triangle(void)
 {
-  iam_register(Triangle_init);
+  iam_register(Triangle_prototype);
 }
 
-#define TRIANGLE_ONLY_FIELD_LIST \
-  X(sideLength, double) 
+#define Triangle_ONLY_FIELD_LIST \
+  X(sideLength, double)
 
-#define TRIANGLE_FIELD_LIST \
-  RECTANGLE_FIELD_LIST      \
-  TRIANGLE_ONLY_FIELD_LIST;
+#define Triangle_FIELD_LIST \
+  Rectangle_FIELD_LIST      \
+  Triangle_ONLY_FIELD_LIST;
 
-#define TRIANGLE_ONLY_METHOD_LIST \
-  METHOD(double, rightAngle) \
-  METHOD(double, sideArea) \
-  METHOD(double, sideArea2) \
-  METHOD(double, getHeight) \
-  METHOD(double, getSide)
+#define Triangle_ONLY_METHOD_LIST       \
+  METHOD(double, _calculateComplex)     \
+  METHOD(double, _calculateAreaIntense) \
+  METHOD(double, _calculateAreaAlt)     \
+  METHOD(double, rightAngle)            \
+  METHOD(double, sideArea)              \
+  METHOD(double, sideArea2)
 
-#define TRIANGLE_METHOD_LIST \
-  RECTANGLE_METHOD_LIST      \
-  TRIANGLE_ONLY_METHOD_LIST;
-
-typedef struct Triangle Triangle;
-typedef struct Triangle_Fn Triangle_Fn;
+#define Triangle_METHOD_LIST \
+  Rectangle_METHOD_LIST      \
+  Triangle_ONLY_METHOD_LIST;
 
 /* Child struct */
-struct Triangle
+typedef struct Triangle
 {
   struct Triangle_Fn *fn; /* own vtable */
 #define X(name, type) type name;
-  TRIANGLE_FIELD_LIST
+  Triangle_FIELD_LIST
 #undef X
-};
+} Triangle;
 
 /* Triangle vtable */
-struct Triangle_Fn
+typedef struct Triangle_Fn
 {
-#define METHOD(ret, name, ...) ret (*name)(Triangle*, ##__VA_ARGS__);
-    TRIANGLE_METHOD_LIST
+#define METHOD(ret, name, ...) ret (*name)(Triangle *, ##__VA_ARGS__);
+  Triangle_METHOD_LIST
 #undef METHOD
   AreaBySideHeight_Adapter AreaBySideHeight;
-};
+} Triangle_Fn;
 
 extern Triangle_Fn Triangle_fn;
 

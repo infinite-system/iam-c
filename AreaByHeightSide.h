@@ -3,11 +3,11 @@
 
 #include "iam.h"
 
-void AreaBySideHeight_init(void);
+void AreaBySideHeight_prototype(void);
 
 __attribute__((constructor)) static void register_AreaBySideHeight(void)
 {
-  iam_register(AreaBySideHeight_init);
+  iam_register(AreaBySideHeight_prototype);
 }
 
 #define AREA_BY_SIDE_HEIGHT_ADAPTER_METHOD_LIST \

@@ -17,9 +17,13 @@ static double sideArea2(void *self, const AreaBySideHeight_Adapter *fn)
 
 AreaBySideHeight_Fn AreaBySideHeight_fn;
 
-/* Mixin initializer */
-void AreaBySideHeight_init(void)
+#define AREA_BY_SIDE_HEIGHT_IMPLEMENTED \
+    X(sideArea)                         \
+    X(sideArea2)
+
+void AreaBySideHeight_prototype(void)
 {
-  AreaBySideHeight_fn.sideArea = sideArea;
-  AreaBySideHeight_fn.sideArea2 = sideArea2;
+#define X(name) AreaBySideHeight_fn.name = name;
+    AREA_BY_SIDE_HEIGHT_IMPLEMENTED
+#undef X
 }
