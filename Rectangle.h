@@ -1,15 +1,10 @@
 #ifndef Rectangle_H
 #define Rectangle_H
 
-#include "iam.h"
 #include "Shape.h"
+#include "module/iam/core/IAM.h"
 
 void Rectangle_prototype(void);
-
-__attribute__((constructor)) static void register_Rectangle(void)
-{
-  iam_register(Rectangle_prototype);
-}
 
 #define Rectangle_ONLY_FIELD_LIST \
   X(multiplier, double)
@@ -29,8 +24,7 @@ __attribute__((constructor)) static void register_Rectangle(void)
       Rectangle_ONLY_METHOD_LIST
 
 /* Child struct */
-typedef struct Rectangle
-{
+typedef struct Rectangle {
   struct Rectangle_Fn *fn; /* own vtable */
 #define X(name, type) type name;
   Rectangle_FIELD_LIST
@@ -38,8 +32,7 @@ typedef struct Rectangle
 } Rectangle;
 
 /* Rectangle vtable */
-typedef struct Rectangle_Fn
-{
+typedef struct Rectangle_Fn {
 #define METHOD(ret, name, ...) ret (*name)(Rectangle *, ##__VA_ARGS__);
   Rectangle_METHOD_LIST
 #undef METHOD

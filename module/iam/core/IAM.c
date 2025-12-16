@@ -1,4 +1,4 @@
-#include "iam.h"
+#include "IAM.h"
 
 #define IAM_DEFAULT_REGISTRY_CAP 50000
 
@@ -8,7 +8,7 @@ static IAM *iam_default = NULL;
 
 /* === INSTANCE METHODS === */
 
-static void registerInit(IAM *self, InitRegistry registerFn) {
+static void registerPrototype(IAM *self, PrototypeRegistry registerFn) {
   if (self->registry_count < self->registry_cap) {
     self->registry[self->registry_count++] = registerFn;
   }
@@ -23,12 +23,11 @@ static void boot(IAM *self) {
 /* === CLASS PROTOTYPE === */
 
 #define IAM_IMPLEMENTED_METHODS \
-  X(registerInit)               \
+  X(registerPrototype)          \
   X(boot)
 
-/* Class prototype */
 IAM_Fn IAM_fn = {
-  .registerInit = registerInit,
+  .registerPrototype = registerPrototype,
   .boot = boot
 };
 
@@ -44,7 +43,7 @@ IAM *IAM_new(size_t registry_cap) {
 
   iam->registry_cap = registry_cap;
   iam->registry_count = 0;
-  iam->registry = malloc(sizeof(InitRegistry) * registry_cap);
+  iam->registry = malloc(sizeof(PrototypeRegistry) * registry_cap);
 
   return iam;
 }
@@ -62,9 +61,9 @@ static IAM *static_getDefaultInstance() {
   return iam_default;
 }
 
-static void static_registerInit(InitRegistry fn) {
+static void static_registerPrototype(PrototypeRegistry fn) {
   IAM *iam = IAM_static.getDefaultInstance();
-  iam->fn->registerInit(iam, fn);
+  iam->fn->registerPrototype(iam, fn);
 }
 
 static void static_boot(void) {
@@ -77,14 +76,14 @@ static void static_boot(void) {
 IAM_Static_Fn IAM_static = {
   .getDefaultRegistryCap = static_defaultRegistryCap,
   .getDefaultInstance = static_getDefaultInstance,
-  .registerInit = static_registerInit,
+  .registerPrototype = static_registerPrototype,
   .boot = static_boot
 };
 
 /* === GLOBAL WORLD HELPERS === */
 
-void iam_register(InitRegistry fn) {
-  IAM_static.registerInit(fn);
+void iam_register(PrototypeRegistry fn) {
+  IAM_static.registerPrototype(fn);
 }
 
 void iam_boot(void) {

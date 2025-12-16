@@ -1,23 +1,18 @@
 #ifndef Triangle_H
 #define Triangle_H
 
-#include "iam.h"
 #include "AreaByHeightSide.h"
 #include "Rectangle.h"
+#include "module/iam/core/IAM.h"
 
 void Triangle_prototype(void);
-
-__attribute__((constructor)) static void register_Triangle(void)
-{
-  iam_register(Triangle_prototype);
-}
 
 #define Triangle_ONLY_FIELD_LIST \
   X(sideLength, double)
 
 #define Triangle_FIELD_LIST \
   Rectangle_FIELD_LIST      \
-  Triangle_ONLY_FIELD_LIST;
+      Triangle_ONLY_FIELD_LIST;
 
 #define Triangle_ONLY_METHOD_LIST       \
   METHOD(double, _calculateComplex)     \
@@ -29,11 +24,10 @@ __attribute__((constructor)) static void register_Triangle(void)
 
 #define Triangle_METHOD_LIST \
   Rectangle_METHOD_LIST      \
-  Triangle_ONLY_METHOD_LIST;
+      Triangle_ONLY_METHOD_LIST;
 
 /* Child struct */
-typedef struct Triangle
-{
+typedef struct Triangle {
   struct Triangle_Fn *fn; /* own vtable */
 #define X(name, type) type name;
   Triangle_FIELD_LIST
@@ -41,12 +35,11 @@ typedef struct Triangle
 } Triangle;
 
 /* Triangle vtable */
-typedef struct Triangle_Fn
-{
+typedef struct Triangle_Fn {
 #define METHOD(ret, name, ...) ret (*name)(Triangle *, ##__VA_ARGS__);
   Triangle_METHOD_LIST
 #undef METHOD
-  AreaBySideHeight_Adapter AreaBySideHeight;
+      AreaBySideHeight_Adapter AreaBySideHeight;
 } Triangle_Fn;
 
 extern Triangle_Fn Triangle_fn;

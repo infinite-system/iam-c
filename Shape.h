@@ -1,14 +1,9 @@
 #ifndef Shape_H
 #define Shape_H
 
-#include "iam.h"
+#include "module/iam/core/IAM.h"
 
 void Shape_prototype(void);
-
-__attribute__((constructor)) static void register_Shape(void)
-{
-  iam_register(Shape_prototype);
-}
 
 /* X-macro field lists */
 #define Shape_FIELD_LIST \
@@ -22,8 +17,7 @@ __attribute__((constructor)) static void register_Shape(void)
   METHOD(void, describe)
 
 /* Generate struct */
-typedef struct Shape
-{
+typedef struct Shape {
   struct Shape_Fn *fn;
 /* fields */
 #define X(name, type) type name;
@@ -32,10 +26,9 @@ typedef struct Shape
 } Shape;
 
 /* vtable */
-typedef struct Shape_Fn
-{
-#define METHOD(ret, name, ...) ret (*name)(Shape*, ##__VA_ARGS__);
-    Shape_METHOD_LIST
+typedef struct Shape_Fn {
+#define METHOD(ret, name, ...) ret (*name)(Shape *, ##__VA_ARGS__);
+  Shape_METHOD_LIST
 #undef METHOD
 } Shape_Fn;
 

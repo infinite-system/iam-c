@@ -16,6 +16,12 @@ BraceWrapping:
   SplitEmptyRecord: false
   SplitEmptyNamespace: false
 
+# ---- Attributes ----
+AllowAllAttributesOnNextLine: true
+
+AttributeMacros:
+  - __attribute__
+
 # ---- Prevent this: "};" on same line ----
 AllowShortBlocksOnASingleLine: Never
 AllowShortFunctionsOnASingleLine: None
