@@ -4,7 +4,7 @@ Filename: AreaByHeightSide.c
 #include <math.h>
 #include <string.h>
 
-#include "module/iam/core/IAM.h"
+#include "module/iam/core/iam.h"
 #include "AreaByHeightSide.h"
 
 static double sideArea(void *self, const AreaBySideHeight_Adapter *fn)
@@ -33,7 +33,7 @@ Filename: AreaByHeightSide.h
 #ifndef AREA_BY_SIDE_HEIGHT_H
 #define AREA_BY_SIDE_HEIGHT_H
 
-#include "module/iam/core/IAM.h"
+#include "module/iam/core/iam.h"
 
 void AreaBySideHeight_prototype(void);
 
@@ -74,7 +74,7 @@ extern AreaBySideHeight_Fn AreaBySideHeight_fn;
 Filename: iam.c
 ----------------------------------------
 // iam.c
-#include "module/iam/core/IAM.h"
+#include "module/iam/core/iam.h"
 
 static InitFn registry[2048];
 static size_t registry_count = 0;
@@ -167,7 +167,7 @@ Filename: Rectangle.c
 #include <math.h>
 #include <string.h>
 
-#include "module/iam/core/IAM.h"
+#include "module/iam/core/iam.h"
 
 #include "Shape.h"
 #include "Rectangle.h"
@@ -253,7 +253,7 @@ Filename: Rectangle.h
 #ifndef Rectangle_H
 #define Rectangle_H
 
-#include "module/iam/core/IAM.h"
+#include "module/iam/core/iam.h"
 #include "Shape.h"
 
 void Rectangle_prototype(void);
@@ -360,7 +360,7 @@ Filename: Shape.h
 #ifndef Shape_H
 #define Shape_H
 
-#include "module/iam/core/IAM.h"
+#include "module/iam/core/iam.h"
 
 void Shape_prototype(void);
 
@@ -413,7 +413,7 @@ Filename: Triangle.c
 #include <math.h>
 #include <string.h>
 
-#include "module/iam/core/IAM.h"
+#include "module/iam/core/iam.h"
 #include "AreaByHeightSide.h"
 #include "Rectangle.h"
 #include "Triangle.h"
@@ -544,7 +544,7 @@ Filename: Triangle.h
 #ifndef Triangle_H
 #define Triangle_H
 
-#include "module/iam/core/IAM.h"
+#include "module/iam/core/iam.h"
 #include "AreaByHeightSide.h"
 #include "Rectangle.h"
 

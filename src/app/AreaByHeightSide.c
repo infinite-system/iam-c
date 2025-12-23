@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "AreaByHeightSide.h"
+#include "app/AreaByHeightSide.h"
 
 static double sideArea(void *self, const AreaBySideHeight_Adapter *fn) {
   return 0.5 * fn->getSide(self) * fn->getHeight(self);
@@ -22,4 +22,8 @@ void AreaBySideHeight_prototype(void) {
 #define X(name) AreaBySideHeight_fn.name = name;
   AREA_BY_SIDE_HEIGHT_IMPLEMENTED
 #undef X
+}
+
+__attribute__((constructor)) static void register_AreaBySideHeight(void) {
+  iam_Kernel_register(AreaBySideHeight_prototype);
 }

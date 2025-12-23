@@ -1,13 +1,16 @@
 #include <stdio.h>
 
-#include "Rectangle.h"
-#include "Shape.h"
-#include "Triangle.h"
-#include "module/iam/core/IAM.h"
-#include "module/iam/example/ancestry/IAM_GrandParent.h"
+#include "app/Rectangle.h"
+#include "app/Shape.h"
+#include "app/Triangle.h"
+#include "module/iam/core/iam.h"
+#include "module/iam/example/ancestry/GrandParent.h"
 
-int main() {
-  iam_boot();
+IAMC_USE_CLASS(iam_Kernel, Kernel);
+
+int
+main() {
+  Kernel_init();
   Triangle *t = Triangle_new();
   t->w = 10;
   t->h = 51;
@@ -44,7 +47,8 @@ int main() {
 
   t2->fn->describe(t2);
 
-  GrandParent *gp = GrandParent_new("John Doe", 75, 180, 80.5, 'M');
+  iam_example_ancestry_GrandParent *gp =
+      iam_example_ancestry_GrandParent_new("John Doe", 75, 180, 80.5, 'M');
   gp->fn->describe(gp);
 
   return 0;

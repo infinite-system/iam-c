@@ -22,17 +22,26 @@ AllowAllAttributesOnNextLine: true
 AttributeMacros:
   - __attribute__
 
-# ---- Prevent this: "};" on same line ----
+# ---- One-liners / blocks ----
 AllowShortBlocksOnASingleLine: Never
 AllowShortFunctionsOnASingleLine: None
 
-# ---- Initializers ----
+# ---- Initializers / arguments ----
 BinPackArguments: false
 BinPackParameters: false
 Cpp11BracedListStyle: false
 
-# ---- General sanity ----
-ColumnLimit: 0
+# ---- Layout / wrapping ----
+ColumnLimit: 110
+ReflowComments: true
 IndentWidth: 2
 TabWidth: 2
 UseTab: Never
+
+# ---- Return type on its own line (MJ style) ----
+AlwaysBreakAfterReturnType: All
+PenaltyReturnTypeOnItsOwnLine: 0
+
+# ---- Pointer style: `iam_Kernel *` ----
+DerivePointerAlignment: false
+PointerAlignment: Right
