@@ -24,6 +24,7 @@ typedef struct iam_Kernel {
 
 /* === METHODS === */
 
+// clang-format off
 #define iam_Kernel_METHOD_LIST(INSTANCE, STATIC, Global, Class)                                              \
   INSTANCE(Global, Class, void, register_prototype, (Global * self, iam_KernelRegistry fn))                  \
   INSTANCE(Global, Class, void, boot, (Global * self))                                                       \
@@ -32,6 +33,7 @@ typedef struct iam_Kernel {
   STATIC(Global, Class, void, register, (iam_KernelRegistry fn))                                             \
   STATIC(Global, Class, void, init, ())                                                                      \
   STATIC(Global, Class, iam_Kernel *, new, (int registry_cap))
+// clang-format on
 
 IAMC_DECLARE_METHODS(iam_Kernel)
 

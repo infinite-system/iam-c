@@ -5,6 +5,23 @@
 
 IAMC_REQUIRE_IMPLEMENTED(iam_Kernel);
 
+/* === CONSTRUCTOR === */
+
+iam_Kernel *
+iam_Kernel_new(int registry_cap) {
+  if (registry_cap == 0) {
+    registry_cap = iam_Kernel_get_default_registry_cap();
+  }
+
+  iam_Kernel *kernel = malloc(sizeof(iam_Kernel));
+
+  kernel->registry_cap = registry_cap;
+  kernel->registry_count = 0;
+  kernel->registry = malloc(sizeof(iam_KernelRegistry) * registry_cap);
+
+  return kernel;
+}
+
 /* === DEFAULT INSTANCE === */
 
 static iam_Kernel *iam_default = NULL;
@@ -23,23 +40,6 @@ iam_Kernel_boot(iam_Kernel *kernel) {
   for (int i = 0; i < kernel->registry_count; i++) {
     kernel->registry[i]();
   }
-}
-
-/* === CONSTRUCTOR === */
-
-iam_Kernel *
-iam_Kernel_new(int registry_cap) {
-  if (registry_cap == 0) {
-    registry_cap = iam_Kernel_get_default_registry_cap();
-  }
-
-  iam_Kernel *kernel = malloc(sizeof(iam_Kernel));
-
-  kernel->registry_cap = registry_cap;
-  kernel->registry_count = 0;
-  kernel->registry = malloc(sizeof(iam_KernelRegistry) * registry_cap);
-
-  return kernel;
 }
 
 /* === STATIC METHODS === */
