@@ -1,6 +1,7 @@
 #ifndef IAM_H
 #define IAM_H
 
+#include "helpers/IAM_Helpers.h"
 #include <stdlib.h>
 
 /* === MEMORY MACRO === */

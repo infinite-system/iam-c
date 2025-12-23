@@ -4,6 +4,7 @@
 #include "Shape.h"
 #include "Triangle.h"
 #include "module/iam/core/IAM.h"
+#include "module/iam/example/ancestry/IAM_GrandParent.h"
 
 int main() {
   iam_boot();
@@ -42,5 +43,9 @@ int main() {
   t2->multiplier = 3;
 
   t2->fn->describe(t2);
+
+  GrandParent *gp = GrandParent_new("John Doe", 75, 180, 80.5, 'M');
+  gp->fn->describe(gp);
+
   return 0;
 }
