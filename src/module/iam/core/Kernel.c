@@ -5,17 +5,17 @@
 
 IAMC_REQUIRE_IMPLEMENTED(iam_Kernel);
 
+#define Kernel_(fn) iam_Kernel_##fn
 typedef iam_Kernel Kernel;
 typedef iam_KernelRegistry KernelRegistry;
 
 /* === CONSTRUCTOR === */
 
 Kernel *
-iam_Kernel_new(int registry_cap) {
+Kernel_(new)(int registry_cap) {
   if (registry_cap == 0) {
-    registry_cap = iam_Kernel_get_default_registry_cap();
+    registry_cap = Kernel_(get_default_registry_cap)();
   }
-
   Kernel *kernel = malloc(sizeof(Kernel));
 
   kernel->registry_cap = registry_cap;
@@ -32,14 +32,14 @@ static Kernel *iam_default = NULL;
 /* === INSTANCE METHODS === */
 
 void
-iam_Kernel_register_prototype(Kernel *kernel, KernelRegistry register_fn) {
+Kernel_(register_prototype)(Kernel *kernel, KernelRegistry register_fn) {
   if (kernel->registry_count < kernel->registry_cap) {
     kernel->registry[kernel->registry_count++] = register_fn;
   }
 }
 
 void
-iam_Kernel_boot(Kernel *kernel) {
+Kernel_(boot)(Kernel *kernel) {
   for (int i = 0; i < kernel->registry_count; i++) {
     kernel->registry[i]();
   }
@@ -48,26 +48,28 @@ iam_Kernel_boot(Kernel *kernel) {
 /* === STATIC METHODS === */
 
 int
-iam_Kernel_get_default_registry_cap() {
-  return iam_Kernel_DEFAULT_REGISTRY_CAP;
+Kernel_(get_default_registry_cap)() {
+  return Kernel_(DEFAULT_REGISTRY_CAP);
 }
 
 Kernel *
-iam_Kernel_get_default_instance() {
+Kernel_(get_default_instance)() {
   if (!iam_default) {
-    iam_default = iam_Kernel_new(0);
+    iam_default = Kernel_(new)(0);
   }
   return iam_default;
 }
 
 void
-iam_Kernel_register(iam_KernelRegistry fn) {
-  Kernel *kernel = iam_Kernel_get_default_instance();
-  iam_Kernel_register_prototype(kernel, fn);
+Kernel_(register)(iam_KernelRegistry fn) {
+  Kernel *kernel = Kernel_(get_default_instance)();
+  Kernel_(register_prototype)(kernel, fn);
 }
 
 void
-iam_Kernel_init() {
-  Kernel *kernel = iam_Kernel_get_default_instance();
-  iam_Kernel_boot(kernel);
+Kernel_(init)() {
+  Kernel *kernel = Kernel_(get_default_instance)();
+  Kernel_(boot)(kernel);
 }
+
+#undef Kernel_

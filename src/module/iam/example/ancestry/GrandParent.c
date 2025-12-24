@@ -3,12 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-IAMC_REQUIRE_IMPLEMENTED(iam_example_ancestry_GrandParent)
+IAMC_REQUIRE_IMPLEMENTED(iam_example_ancestry_GrandParent);
 
+#define GrandParent_(fn) iam_example_ancestry_GrandParent_##fn
 typedef iam_example_ancestry_GrandParent GrandParent;
 
-GrandParent *
-iam_example_ancestry_GrandParent_constructor(
+inline GrandParent *
+GrandParent_(constructor)(
   GrandParent *gp,
   const char *name,
   int age,
@@ -25,29 +26,27 @@ iam_example_ancestry_GrandParent_constructor(
 }
 
 GrandParent *
-iam_example_ancestry_GrandParent_new(
+GrandParent_(new)(
   const char *name, int age, int height, double weight, char gender
 ) {
   GrandParent *gp = NEW(GrandParent);
-  return iam_example_ancestry_GrandParent_constructor(
-    gp, name, age, height, weight, gender
-  );
+  return GrandParent_(constructor)(gp, name, age, height, weight, gender);
 }
 
 double
-iam_example_ancestry_GrandParent_eat(GrandParent *gp, double foodWeight) {
+GrandParent_(eat)(GrandParent *gp, double foodWeight) {
   gp->weight += foodWeight * 0.25;
   return gp->weight;
 }
 
 double
-iam_example_ancestry_GrandParent_diet(GrandParent *gp, double daysLength) {
+GrandParent_(diet)(GrandParent *gp, double daysLength) {
   gp->weight -= daysLength * 0.15;
   return gp->weight;
 }
 
 void
-iam_example_ancestry_GrandParent_describe(GrandParent *gp) {
+GrandParent_(describe)(GrandParent *gp) {
   printf(
     "GrandParent %s: Age %d, Height %d, Weight %.2f, Gender %c\n",
     gp->name,
@@ -57,3 +56,5 @@ iam_example_ancestry_GrandParent_describe(GrandParent *gp) {
     gp->gender
   );
 }
+
+#undef GrandParent_

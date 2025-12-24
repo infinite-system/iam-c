@@ -24,19 +24,20 @@ typedef struct iam_Kernel {
 
 /* === METHODS === */
 
-#define iam_Kernel_METHOD_LIST(INST, STAT, Global, Class)                      \
-  INST(                                                                        \
+#define iam_Kernel_METHOD_LIST(THIS, STATIC, Global, Class)                    \
+  THIS(                                                                        \
     Global,                                                                    \
     Class,                                                                     \
     register_prototype,                                                        \
     void,                                                                      \
-    (Class * self, iam_KernelRegistry fn))                                     \
-  INST(Global, Class, boot, void, (Class * self))                              \
-  STAT(Global, Class, get_default_instance, Class *, ())                       \
-  STAT(Global, Class, get_default_registry_cap, int, ())                       \
-  STAT(Global, Class, register, void, (iam_KernelRegistry fn))                 \
-  STAT(Global, Class, init, void, ())                                          \
-  STAT(Global, Class, new, Class *, (int registry_cap))
+    (Class * self, iam_KernelRegistry fn)                                      \
+  )                                                                            \
+  THIS(Global, Class, boot, void, (Class * self))                              \
+  STATIC(Global, Class, get_default_instance, Class *, ())                     \
+  STATIC(Global, Class, get_default_registry_cap, int, ())                     \
+  STATIC(Global, Class, register, void, (iam_KernelRegistry fn))               \
+  STATIC(Global, Class, init, void, ())                                        \
+  STATIC(Global, Class, new, Class *, (int registry_cap))
 
 IAMC_DECLARE_METHODS(iam_Kernel)
 

@@ -21,12 +21,12 @@ typedef struct iam_example_ancestry_GrandParent {
 /* === METHODS === */
 
 #define iam_example_ancestry_GrandParent_METHOD_LIST(                          \
-  INST, STAT, Global, Class                                                    \
+  THIS, STATIC, Global, Class                                                  \
 )                                                                              \
-  INST(Global, Class, diet, double, (Class * self, double daysLength))         \
-  INST(Global, Class, eat, double, (Class * self, double foodWeight))          \
-  INST(Global, Class, describe, void, (Class * self))                          \
-  STAT(                                                                        \
+  THIS(Global, Class, diet, double, (Class * self, double daysLength))         \
+  THIS(Global, Class, eat, double, (Class * self, double foodWeight))          \
+  THIS(Global, Class, describe, void, (Class * self))                          \
+  STATIC(                                                                      \
     Global,                                                                    \
     Class,                                                                     \
     constructor,                                                               \
@@ -38,7 +38,7 @@ typedef struct iam_example_ancestry_GrandParent {
      double weight,                                                            \
      char gender)                                                              \
   )                                                                            \
-  STAT(                                                                        \
+  STATIC(                                                                      \
     Global,                                                                    \
     Class,                                                                     \
     new,                                                                       \

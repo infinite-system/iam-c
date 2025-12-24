@@ -44,15 +44,15 @@
 
 /* === METHOD DECLARATION MACROS === */
 
-#define __IAMC_DECLARE_INSTANCE(Global, Class, name, ret, args)                \
-  ret Global##_##name args;
+#define __IAMC_DECLARE_INSTANCE(Global, Class, fn, ret, args)                  \
+  ret Global##_##fn args;
 
-// Static methods: ret Global_name(...)
-#define __IAMC_DECLARE_STATIC(Global, Class, name, ret, args)                  \
-  ret Global##_##name args;
+// Static methods: ret Global_fn(...)
+#define __IAMC_DECLARE_STATIC(Global, Class, fn, ret, args)                    \
+  ret Global##_##fn args;
 
 // Generate prototypes for all methods declared in Global_METHOD_LIST.
-// Global is the full global type name, e.g. iam_geometry_Shape.
+// Global is the full global type fn, e.g. iam_geometry_Shape.
 #define IAMC_DECLARE_METHODS(Global)                                           \
   Global##_METHOD_LIST(                                                        \
     __IAMC_DECLARE_INSTANCE, __IAMC_DECLARE_STATIC, Global, Global             \
@@ -61,22 +61,22 @@
 // Internal helpers: build an "anchor" array of function pointers.
 // If any method is missing at link time, you get an undefined symbol error.
 
-#define IAMC__REQUIRE_ANCHOR_INSTANCE(Global, ClassType, name, ret, args)      \
-  (const void *)&Global##_##name,
+#define __IAMC_REQUIRE_ANCHOR_INSTANCE(Global, ClassType, fn, ret, args)       \
+  (const void *)&Global##_##fn,
 
-#define IAMC__REQUIRE_ANCHOR_STATIC(Global, ClassType, name, ret, args)        \
-  (const void *)&Global##_##name,
+#define __IAMC_REQUIRE_ANCHOR_STATIC(Global, ClassType, fn, ret, args)         \
+  (const void *)&Global##_##fn,
 
 // Strong enforcement: always active.
 // Usage in ONE .c file per class:
 //   #include "module/iam/.../Rectangle.h"
 //   #include "module/iam/core/iamc_require.h"
 //   IAMC_REQUIRE_IMPLEMENTED(iam_geometry_Rectangle);
-#define IAMC_REQUIRE_IMPLEMENTED_DEBUG(GlobalType)                             \
+#define __IAMC_REQUIRE_IMPLEMENTED_DEBUG(GlobalType)                           \
   static const void *const iamc_require_##GlobalType##_anchors[]               \
     __attribute__((used)) = { GlobalType##_METHOD_LIST(                        \
-      IAMC__REQUIRE_ANCHOR_INSTANCE,                                           \
-      IAMC__REQUIRE_ANCHOR_STATIC,                                             \
+      __IAMC_REQUIRE_ANCHOR_INSTANCE,                                          \
+      __IAMC_REQUIRE_ANCHOR_STATIC,                                            \
       GlobalType,                                                              \
       GlobalType                                                               \
     ) };
@@ -85,19 +85,19 @@
 // Build with -DIAMC_DEBUG to turn it on; otherwise it’s a no-op.
 #ifdef IAMC_DEBUG
 #define IAMC_REQUIRE_IMPLEMENTED(GlobalType)                                   \
-  IAMC_REQUIRE_IMPLEMENTED_DEBUG(GlobalType)
+  __IAMC_REQUIRE_IMPLEMENTED_DEBUG(GlobalType)
 #else
 #define IAMC_REQUIRE_IMPLEMENTED(GlobalType) /* debug enforcement disabled */
 #endif
 
 // Local wrappers for instance methods:
 //  Kernel_init(Kernel* self, ...) → iam_Kernel_init(iam_Kernel* self, ...)
-#define IAMC__LOCAL_INSTANCE(Global, Class, name, ret, args)                   \
-  static ret(*Class##_##name) args = Global##_##name;
+#define __IAMC_LOCAL_INSTANCE(Global, Class, fn, ret, args)                    \
+  static ret(*Class##_##fn) args = Global##_##fn;
 
 // Local static alias: Kernel_init(...) → (*Kernel_init)(...)
-#define IAMC__LOCAL_STATIC(Global, Class, name, ret, args)                     \
-  static ret(*Class##_##name) args = Global##_##name;
+#define __IAMC_LOCAL_STATIC(Global, Class, fn, ret, args)                      \
+  static ret(*Class##_##fn) args = Global##_##fn;
 
 // User-facing:
 //   IAMC_USE_CLASS(iam_Kernel, Kernel);
@@ -110,5 +110,5 @@
 #define IAMC_USE_CLASS(GlobalType, LocalName)                                  \
   typedef GlobalType LocalName;                                                \
   GlobalType##_METHOD_LIST(                                                    \
-    IAMC__LOCAL_INSTANCE, IAMC__LOCAL_STATIC, GlobalType, LocalName            \
+    __IAMC_LOCAL_INSTANCE, __IAMC_LOCAL_STATIC, GlobalType, LocalName          \
   )
