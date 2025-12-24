@@ -5,7 +5,6 @@
 
 IAMC_REQUIRE_IMPLEMENTED(iam_Kernel);
 
-#define Kernel_(fn) iam_Kernel_##fn
 typedef iam_Kernel Kernel;
 typedef iam_KernelRegistry KernelRegistry;
 
@@ -33,14 +32,14 @@ static Kernel *iam_default = NULL;
 /* === INSTANCE METHODS === */
 
 void
-Kernel_(register_prototype)(Kernel *kernel, KernelRegistry register_fn) {
+iam_Kernel_register_prototype(Kernel *kernel, KernelRegistry register_fn) {
   if (kernel->registry_count < kernel->registry_cap) {
     kernel->registry[kernel->registry_count++] = register_fn;
   }
 }
 
 void
-Kernel_(boot)(Kernel *kernel) {
+iam_Kernel_boot(Kernel *kernel) {
   for (int i = 0; i < kernel->registry_count; i++) {
     kernel->registry[i]();
   }
@@ -72,5 +71,3 @@ iam_Kernel_init() {
   Kernel *kernel = iam_Kernel_get_default_instance();
   iam_Kernel_boot(kernel);
 }
-
-#undef Kernel_
