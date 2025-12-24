@@ -3,11 +3,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-iam_example_ancestry_GrandParent_Fn iam_example_ancestry_GrandParent_fn;
-static iam_example_ancestry_GrandParent *
-constructor(void *self, const char *name, int age, int height, double weight, char gender) {
-  iam_example_ancestry_GrandParent *gp = self;
-  gp->fn = &iam_example_ancestry_GrandParent_fn;
+IAMC_REQUIRE_IMPLEMENTED(iam_example_ancestry_GrandParent)
+
+typedef iam_example_ancestry_GrandParent GrandParent;
+
+GrandParent *
+iam_example_ancestry_GrandParent_constructor(
+  GrandParent *gp,
+  const char *name,
+  int age,
+  int height,
+  double weight,
+  char gender
+) {
   iam_strcpy(gp->name, sizeof gp->name, name);
   gp->age = age;
   gp->height = height;
@@ -16,51 +24,36 @@ constructor(void *self, const char *name, int age, int height, double weight, ch
   return gp;
 }
 
-static void
-eat(void *self, double foodWeight) {
-  iam_example_ancestry_GrandParent *gp = self;
+GrandParent *
+iam_example_ancestry_GrandParent_new(
+  const char *name, int age, int height, double weight, char gender
+) {
+  GrandParent *gp = NEW(GrandParent);
+  return iam_example_ancestry_GrandParent_constructor(
+    gp, name, age, height, weight, gender
+  );
+}
+
+double
+iam_example_ancestry_GrandParent_eat(GrandParent *gp, double foodWeight) {
   gp->weight += foodWeight * 0.25;
+  return gp->weight;
 }
 
-static void
-diet(void *self, double daysLength) {
-  iam_example_ancestry_GrandParent *gp = self;
-  gp->weight -= daysLength * 0.1;
+double
+iam_example_ancestry_GrandParent_diet(GrandParent *gp, double daysLength) {
+  gp->weight -= daysLength * 0.15;
+  return gp->weight;
 }
 
-static void
-describe(void *self) {
-  iam_example_ancestry_GrandParent *gp = self;
-  printf("GrandParent %s: Age %d, Height %d, Weight %.2f, Gender %c\n",
-         gp->name,
-         gp->age,
-         gp->height,
-         gp->weight,
-         gp->gender);
-}
-
-#define iam_example_ancestry_GrandParent_IMPLEMENTED_METHODS                                                 \
-  /* Core geometry */                                                                                        \
-  X(constructor)                                                                                             \
-  X(eat)                                                                                                     \
-  X(diet)                                                                                                    \
-  X(describe)
-
-/* Class prototype */
 void
-iam_example_ancestry_GrandParent_prototype(void) {
-#define X(name) iam_example_ancestry_GrandParent_fn.name = name;
-  iam_example_ancestry_GrandParent_IMPLEMENTED_METHODS
-#undef X
-}
-
-__attribute__((constructor)) static void
-register_iam_example_ancestry_GrandParent(void) {
-  iam_Kernel_register(iam_example_ancestry_GrandParent_prototype);
-}
-
-iam_example_ancestry_GrandParent *
-iam_example_ancestry_GrandParent_new(const char *name, int age, int height, double weight, char gender) {
-  void *self = NEW(iam_example_ancestry_GrandParent);
-  return iam_example_ancestry_GrandParent_fn.constructor(self, name, age, height, weight, gender);
+iam_example_ancestry_GrandParent_describe(GrandParent *gp) {
+  printf(
+    "GrandParent %s: Age %d, Height %d, Weight %.2f, Gender %c\n",
+    gp->name,
+    gp->age,
+    gp->height,
+    gp->weight,
+    gp->gender
+  );
 }

@@ -11,9 +11,9 @@ typedef void (*iam_KernelRegistry)(void);
 
 /* === FIELDS === */
 
-#define iam_Kernel_FIELD_LIST                                                                                \
-  FIELD(registry, iam_KernelRegistry *)                                                                      \
-  FIELD(registry_count, int)                                                                                 \
+#define iam_Kernel_FIELD_LIST                                                  \
+  FIELD(registry, iam_KernelRegistry *)                                        \
+  FIELD(registry_count, int)                                                   \
   FIELD(registry_cap, int)
 
 typedef struct iam_Kernel {
@@ -24,16 +24,19 @@ typedef struct iam_Kernel {
 
 /* === METHODS === */
 
-// clang-format off
-#define iam_Kernel_METHOD_LIST(INSTANCE, STATIC, Global, Class)                                              \
-  INSTANCE(Global, Class, void, register_prototype, (Global * self, iam_KernelRegistry fn))                  \
-  INSTANCE(Global, Class, void, boot, (Global * self))                                                       \
-  STATIC(Global, Class, iam_Kernel *, get_default_instance, ())                                              \
-  STATIC(Global, Class, int, get_default_registry_cap, ())                                                   \
-  STATIC(Global, Class, void, register, (iam_KernelRegistry fn))                                             \
-  STATIC(Global, Class, void, init, ())                                                                      \
-  STATIC(Global, Class, iam_Kernel *, new, (int registry_cap))
-// clang-format on
+#define iam_Kernel_METHOD_LIST(INST, STAT, Global, Class)                      \
+  INST(                                                                        \
+    Global,                                                                    \
+    Class,                                                                     \
+    register_prototype,                                                        \
+    void,                                                                      \
+    (Class * self, iam_KernelRegistry fn))                                     \
+  INST(Global, Class, boot, void, (Class * self))                              \
+  STAT(Global, Class, get_default_instance, Class *, ())                       \
+  STAT(Global, Class, get_default_registry_cap, int, ())                       \
+  STAT(Global, Class, register, void, (iam_KernelRegistry fn))                 \
+  STAT(Global, Class, init, void, ())                                          \
+  STAT(Global, Class, new, Class *, (int registry_cap))
 
 IAMC_DECLARE_METHODS(iam_Kernel)
 

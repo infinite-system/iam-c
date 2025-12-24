@@ -3,44 +3,49 @@
 
 #include "module/iam/core/iam.h"
 
-void
-iam_example_ancestry_GrandParent_prototype(void);
+/* === FIELDS === */
 
-/* X-macro field lists */
-#define iam_example_ancestry_GrandParent_FIELD_LIST                                                          \
-  X(name, iam_str64)                                                                                         \
-  X(age, int)                                                                                                \
-  X(height, int)                                                                                             \
-  X(weight, double)                                                                                          \
-  X(gender, char)
+#define iam_example_ancestry_GrandParent_FIELD_LIST                            \
+  FIELD(name, iam_str64)                                                       \
+  FIELD(age, int)                                                              \
+  FIELD(height, int)                                                           \
+  FIELD(weight, double)                                                        \
+  FIELD(gender, char)
 
-/* X-macro method lists */
-#define iam_example_ancestry_GrandParent_METHOD_LIST                                                         \
-  METHOD(iam_example_ancestry_GrandParent *, constructor, const char *, int, int, double, char)              \
-  METHOD(void, eat, double)                                                                                  \
-  METHOD(void, diet, double)                                                                                 \
-  METHOD(void, describe)
-
-/* Generate struct */
 typedef struct iam_example_ancestry_GrandParent {
-  struct iam_example_ancestry_GrandParent_Fn *fn;
-/* fields */
-#define X(name, type) type name;
+#define FIELD(name, type) type name;
   iam_example_ancestry_GrandParent_FIELD_LIST
-#undef X
+#undef FIELD
 } iam_example_ancestry_GrandParent;
 
-/* vtable */
-typedef struct iam_example_ancestry_GrandParent_Fn {
-#define METHOD(ret, name, ...) ret (*name)(void *, ##__VA_ARGS__);
-  iam_example_ancestry_GrandParent_METHOD_LIST
-#undef METHOD
-} iam_example_ancestry_GrandParent_Fn;
+/* === METHODS === */
 
-extern iam_example_ancestry_GrandParent_Fn iam_example_ancestry_GrandParent_fn;
+#define iam_example_ancestry_GrandParent_METHOD_LIST(                          \
+  INST, STAT, Global, Class                                                    \
+)                                                                              \
+  INST(Global, Class, diet, double, (Class * self, double daysLength))         \
+  INST(Global, Class, eat, double, (Class * self, double foodWeight))          \
+  INST(Global, Class, describe, void, (Class * self))                          \
+  STAT(                                                                        \
+    Global,                                                                    \
+    Class,                                                                     \
+    constructor,                                                               \
+    Class *,                                                                   \
+    (Class * self,                                                             \
+     const char *name,                                                         \
+     int age,                                                                  \
+     int height,                                                               \
+     double weight,                                                            \
+     char gender)                                                              \
+  )                                                                            \
+  STAT(                                                                        \
+    Global,                                                                    \
+    Class,                                                                     \
+    new,                                                                       \
+    Class *,                                                                   \
+    (const char *name, int age, int height, double weight, char gender)        \
+  )
 
-/* ctor */
-iam_example_ancestry_GrandParent *
-iam_example_ancestry_GrandParent_new(const char *name, int age, int height, double weight, char gender);
+IAMC_DECLARE_METHODS(iam_example_ancestry_GrandParent)
 
 #endif

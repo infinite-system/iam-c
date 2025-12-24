@@ -46,15 +46,16 @@ Rectangle_Fn Rectangle_fn;
 
 #define Rectangle_PRIVATE_METHODS X(_privateMethod)
 
-#define Rectangle_PUBLIC_METHODS                                                                             \
-  /* Core geometry */                                                                                        \
-  X(area)                                                                                                    \
-  X(describe)                                                                                                \
-  X(scaledArea)                                                                                              \
-  X(diagonal)                                                                                                \
+#define Rectangle_PUBLIC_METHODS                                               \
+  /* Core geometry */                                                          \
+  X(area)                                                                      \
+  X(describe)                                                                  \
+  X(scaledArea)                                                                \
+  X(diagonal)                                                                  \
   X(parentMethod)
 
-#define Rectangle_IMPLEMENTED_METHODS Rectangle_PRIVATE_METHODS Rectangle_PUBLIC_METHODS
+#define Rectangle_IMPLEMENTED_METHODS                                          \
+  Rectangle_PRIVATE_METHODS Rectangle_PUBLIC_METHODS
 
 /* class initializer */
 void
@@ -63,7 +64,7 @@ Rectangle_prototype(void) {
   if (done)
     return;
   done = 1;
-  Shape_prototype();                            // ensure parent prototype is initialized
+  Shape_prototype(); // ensure parent prototype is initialized
   INHERIT_METHODS_FROM(Shape_fn, Rectangle_fn); // auto copy
 
 #define X(name) Rectangle_fn.name = name;

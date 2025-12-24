@@ -3,7 +3,6 @@ Language: C
 
 # ---- Braces ----
 BreakBeforeBraces: Attach
-
 BraceWrapping:
   AfterFunction: false
   AfterStruct: false
@@ -18,7 +17,6 @@ BraceWrapping:
 
 # ---- Attributes ----
 AllowAllAttributesOnNextLine: true
-
 AttributeMacros:
   - __attribute__
 
@@ -31,10 +29,18 @@ BinPackArguments: false
 BinPackParameters: false
 Cpp11BracedListStyle: false
 
+# When args/params wrap, use:
+#   fn(
+#     a,
+#     b
+#   )
+AlignAfterOpenBracket: BlockIndent
+
 # ---- Layout / wrapping ----
-ColumnLimit: 110
+ColumnLimit: 80
 ReflowComments: true
 IndentWidth: 2
+ContinuationIndentWidth: 2
 TabWidth: 2
 UseTab: Never
 

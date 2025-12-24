@@ -6,7 +6,8 @@
 #include "module/iam/core/iam.h"
 #include "module/iam/example/ancestry/GrandParent.h"
 
-IAMC_USE_CLASS(iam_Kernel, Kernel);
+IAMC_USE_CLASS(iam_Kernel, Kernel)
+IAMC_USE_CLASS(iam_example_ancestry_GrandParent, GrandParent)
 
 int
 main() {
@@ -47,9 +48,8 @@ main() {
 
   t2->fn->describe(t2);
 
-  iam_example_ancestry_GrandParent *gp =
-      iam_example_ancestry_GrandParent_new("John Doe", 75, 180, 80.5, 'M');
-  gp->fn->describe(gp);
+  GrandParent *gp = GrandParent_new("John Doe", 75, 180, 80.5, 'M');
+  GrandParent_describe(gp);
 
   return 0;
 }
