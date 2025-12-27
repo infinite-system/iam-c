@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef iam_h
 #define iam_h
 

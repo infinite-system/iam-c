@@ -44,12 +44,12 @@
 
 /* === METHOD DECLARATION MACROS === */
 
-#define __IAMC_DECLARE_INSTANCE(Global, Class, fn, ret, args)                  \
-  ret Global##_##fn args;
+#define __IAMC_DECLARE_INSTANCE(Global, Class, fn, args, returnType)           \
+  returnType Global##_##fn args;
 
-// Static methods: ret Global_fn(...)
-#define __IAMC_DECLARE_STATIC(Global, Class, fn, ret, args)                    \
-  ret Global##_##fn args;
+// Static methods: returnType Global_fn(...)
+#define __IAMC_DECLARE_STATIC(Global, Class, fn, args, returnType)             \
+  returnType Global##_##fn args;
 
 // Generate prototypes for all methods declared in Global_METHOD_LIST.
 // Global is the full global type fn, e.g. iam_geometry_Shape.
@@ -61,10 +61,10 @@
 // Internal helpers: build an "anchor" array of function pointers.
 // If any method is missing at link time, you get an undefined symbol error.
 
-#define __IAMC_REQUIRE_ANCHOR_INSTANCE(Global, ClassType, fn, ret, args)       \
+#define __IAMC_REQUIRE_ANCHOR_INSTANCE(Global, Class, fn, args, returnType)    \
   (const void *)&Global##_##fn,
 
-#define __IAMC_REQUIRE_ANCHOR_STATIC(Global, ClassType, fn, ret, args)         \
+#define __IAMC_REQUIRE_ANCHOR_STATIC(Global, Class, fn, args, returnType)      \
   (const void *)&Global##_##fn,
 
 // Strong enforcement: always active.
@@ -72,32 +72,32 @@
 //   #include "module/iam/.../Rectangle.h"
 //   #include "module/iam/core/iamc_require.h"
 //   IAMC_REQUIRE_IMPLEMENTED(iam_geometry_Rectangle);
-#define __IAMC_REQUIRE_IMPLEMENTED_DEBUG(GlobalType)                           \
-  static const void *const iamc_require_##GlobalType##_anchors[]               \
-    __attribute__((used)) = { GlobalType##_METHOD_LIST(                        \
+#define __IAMC_REQUIRE_IMPLEMENTED_DEBUG(Global)                               \
+  static const void *const iamc_require_##Global##_anchors[]                   \
+    __attribute__((used)) = { Global##_METHOD_LIST(                            \
       __IAMC_REQUIRE_ANCHOR_INSTANCE,                                          \
       __IAMC_REQUIRE_ANCHOR_STATIC,                                            \
-      GlobalType,                                                              \
-      GlobalType                                                               \
+      Global,                                                                  \
+      Global                                                                   \
     ) };
 
 // Debug-only enforcement:
 // Build with -DIAMC_DEBUG to turn it on; otherwise it’s a no-op.
 #ifdef IAMC_DEBUG
-#define IAMC_REQUIRE_IMPLEMENTED(GlobalType)                                   \
-  __IAMC_REQUIRE_IMPLEMENTED_DEBUG(GlobalType)
+#define IAMC_REQUIRE_IMPLEMENTED(Global)                                       \
+  __IAMC_REQUIRE_IMPLEMENTED_DEBUG(Global)
 #else
-#define IAMC_REQUIRE_IMPLEMENTED(GlobalType) /* debug enforcement disabled */
+#define IAMC_REQUIRE_IMPLEMENTED(Global) /* debug enforcement disabled */
 #endif
 
 // Local wrappers for instance methods:
 //  Kernel_init(Kernel* self, ...) → iam_Kernel_init(iam_Kernel* self, ...)
-#define __IAMC_LOCAL_INSTANCE(Global, Class, fn, ret, args)                    \
-  static ret(*Class##_##fn) args = Global##_##fn;
+#define __IAMC_LOCAL_INSTANCE(Global, Class, fn, args, returnType)             \
+  static returnType(*Class##_##fn) args = Global##_##fn;
 
 // Local static alias: Kernel_init(...) → (*Kernel_init)(...)
-#define __IAMC_LOCAL_STATIC(Global, Class, fn, ret, args)                      \
-  static ret(*Class##_##fn) args = Global##_##fn;
+#define __IAMC_LOCAL_STATIC(Global, Class, fn, args, returnType)               \
+  static returnType(*Class##_##fn) args = Global##_##fn;
 
 // User-facing:
 //   IAMC_USE_CLASS(iam_Kernel, Kernel);
@@ -107,8 +107,8 @@
 //   static Kernel_boot               = iam_Kernel_boot;
 //   static Kernel_init               = iam_Kernel_init;
 //   ...
-#define IAMC_USE_CLASS(GlobalType, LocalName)                                  \
-  typedef GlobalType LocalName;                                                \
-  GlobalType##_METHOD_LIST(                                                    \
-    __IAMC_LOCAL_INSTANCE, __IAMC_LOCAL_STATIC, GlobalType, LocalName          \
+#define IAMC_USE_CLASS(Global, LocalName)                                      \
+  typedef Global LocalName;                                                    \
+  Global##_METHOD_LIST(                                                        \
+    __IAMC_LOCAL_INSTANCE, __IAMC_LOCAL_STATIC, Global, LocalName              \
   )

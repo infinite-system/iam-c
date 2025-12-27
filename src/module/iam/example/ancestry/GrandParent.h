@@ -23,27 +23,27 @@ typedef struct iam_example_ancestry_GrandParent {
 #define iam_example_ancestry_GrandParent_METHOD_LIST(                          \
   THIS, STATIC, Global, Class                                                  \
 )                                                                              \
-  THIS(Global, Class, diet, double, (Class * self, double daysLength))         \
-  THIS(Global, Class, eat, double, (Class * self, double foodWeight))          \
-  THIS(Global, Class, describe, void, (Class * self))                          \
+  THIS(Global, Class, diet, (Class * self, double daysLength), double)         \
+  THIS(Global, Class, eat, (Class * self, double foodWeight), double)          \
+  THIS(Global, Class, describe, (Class * self), void)                          \
   STATIC(                                                                      \
     Global,                                                                    \
     Class,                                                                     \
     constructor,                                                               \
-    Class *,                                                                   \
     (Class * self,                                                             \
      const char *name,                                                         \
      int age,                                                                  \
      int height,                                                               \
      double weight,                                                            \
-     char gender)                                                              \
+     char gender),                                                             \
+    Class *                                                                    \
   )                                                                            \
   STATIC(                                                                      \
     Global,                                                                    \
     Class,                                                                     \
     new,                                                                       \
-    Class *,                                                                   \
-    (const char *name, int age, int height, double weight, char gender)        \
+    (const char *name, int age, int height, double weight, char gender),       \
+    Class *                                                                    \
   )
 
 IAMC_DECLARE_METHODS(iam_example_ancestry_GrandParent)

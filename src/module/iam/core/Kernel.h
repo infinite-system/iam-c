@@ -2,7 +2,7 @@
 #define iam_Kernel_h
 
 #include "module/iam/core/macro.h"
-#include "module/iam/core/string.h"
+#include "string.h"
 
 /* === KERNEL REGISTRY === */
 
@@ -29,15 +29,18 @@ typedef struct iam_Kernel {
     Global,                                                                    \
     Class,                                                                     \
     register_prototype,                                                        \
-    void,                                                                      \
-    (Class * self, iam_KernelRegistry fn)                                      \
+    (Class * self, iam_KernelRegistry fn),                                     \
+    void                                                                       \
   )                                                                            \
-  THIS(Global, Class, boot, void, (Class * self))                              \
-  STATIC(Global, Class, get_default_instance, Class *, ())                     \
-  STATIC(Global, Class, get_default_registry_cap, int, ())                     \
-  STATIC(Global, Class, register, void, (iam_KernelRegistry fn))               \
-  STATIC(Global, Class, init, void, ())                                        \
-  STATIC(Global, Class, new, Class *, (int registry_cap))
+  THIS(Global, Class, boot, (Class * self), void)                              \
+  STATIC(Global, Class, get_default_instance, (), Class *)                     \
+  STATIC(Global, Class, get_default_registry_cap, (), int)                     \
+  STATIC(Global, Class, register, (iam_KernelRegistry fn), void)               \
+  STATIC(Global, Class, init, (), void)                                        \
+  STATIC(                                                                      \
+    Global, Class, constructor, (Class * self, int registry_cap), Class *      \
+  )                                                                            \
+  STATIC(Global, Class, new, (int registry_cap), Class *)
 
 IAMC_DECLARE_METHODS(iam_Kernel)
 

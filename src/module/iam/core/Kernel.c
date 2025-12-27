@@ -13,15 +13,18 @@ typedef iam_KernelRegistry KernelRegistry;
 
 Kernel *
 Kernel_(new)(int registry_cap) {
-  if (registry_cap == 0) {
-    registry_cap = Kernel_(get_default_registry_cap)();
-  }
   Kernel *kernel = malloc(sizeof(Kernel));
+  return Kernel_(constructor)(kernel, registry_cap);
+}
 
-  kernel->registry_cap = registry_cap;
-  kernel->registry_count = 0;
+inline Kernel *
+Kernel_(constructor)(Kernel *kernel, int registry_cap) {
+  if (registry_cap <= 0) {
+    registry_cap = Kernel_(DEFAULT_REGISTRY_CAP);
+  }
   kernel->registry = malloc(sizeof(KernelRegistry) * registry_cap);
-
+  kernel->registry_count = 0;
+  kernel->registry_cap = registry_cap;
   return kernel;
 }
 
