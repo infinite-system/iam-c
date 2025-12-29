@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef IAM_EXAMPLE_ANCESTRY_PARENT_INHERITS_H
-#define IAM_EXAMPLE_ANCESTRY_PARENT_INHERITS_H
+#ifndef iam_example_ancestry_Parent_INHERITS_H
+#define iam_example_ancestry_Parent_INHERITS_H
 
 double
 iam_example_ancestry_Parent_diet(iam_example_ancestry_Parent * self, double daysLength) {

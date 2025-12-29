@@ -722,29 +722,57 @@ async function buildClassIndexWithDeps(
   return index;
 }
 
-const fullMethodsMemo = new Map<string, Map<string, Method>>();
+type FullMethodEntry = { method: Method; origin: ClassInfo };
+const fullMethodsMemo = new Map<string, Map<string, FullMethodEntry>>();
 
-function getFullMethods(
+const directImplMemo = new Map<string, Set<string>>();
+
+async function getDirectImplementedFns(ci: ClassInfo): Promise<Set<string>> {
+  const cached = directImplMemo.get(ci.global);
+  if (cached) return cached;
+
+  if (!ci.cPathAbs) {
+    const empty = new Set<string>();
+    directImplMemo.set(ci.global, empty);
+    return empty;
+  }
+
+  const txt = await readText(ci.cPathAbs);
+  const impl = findImplementedMethodsInC(txt, ci.global); // already strips comments internally
+  directImplMemo.set(ci.global, impl);
+  return impl;
+}
+async function getFullMethods(
   ci: ClassInfo,
   index: Map<string, ClassInfo>
-): Map<string, Method> {
+): Promise<Map<string, FullMethodEntry>> {
   const cached = fullMethodsMemo.get(ci.global);
   if (cached) return cached;
 
-  const out = new Map<string, Method>();
+  const out = new Map<string, FullMethodEntry>();
 
-  // add this class's direct methods
+  // direct methods: origin is this class
   for (const m of ci.methods) {
-    out.set(methodKey(m), m);
+    out.set(methodKey(m), { method: m, origin: ci });
   }
 
-  // merge parent full methods for anything not overridden locally
+  // merge parent full methods; if THIS class overrides a method in its .c,
+  // then origin becomes THIS class even if the signature comes from parent.
   if (ci.parentGlobal) {
     const p = index.get(ci.parentGlobal);
     if (p) {
-      const pm = getFullMethods(p, index);
-      for (const [k, m] of pm.entries()) {
-        if (!out.has(k)) out.set(k, m);
+      const pm = await getFullMethods(p, index);
+      const directImpl = await getDirectImplementedFns(ci);
+
+      for (const [k, entry] of pm.entries()) {
+        if (out.has(k)) continue;
+
+        // if ci defines <ci.global>_<fn> in its .c, treat that as an override origin
+        if (directImpl.has(entry.method.fn)) {
+          out.set(k, { method: entry.method, origin: ci });
+        } else {
+          out.set(k, entry); // preserve parent's origin
+        }
       }
     }
   }
@@ -752,27 +780,21 @@ function getFullMethods(
   fullMethodsMemo.set(ci.global, out);
   return out;
 }
-
 /** Resolve inheritance chain methods to nearest ancestor that defines each method key. */
-function resolveAncestorMethods(
+async function resolveAncestorMethods(
   child: ClassInfo,
   index: Map<string, ClassInfo>
-): Map<string, ResolvedMethod> {
+): Promise<Map<string, ResolvedMethod>> {
   const resolved = new Map<string, ResolvedMethod>();
 
-  let curGlobal = child.parentGlobal;
-  while (curGlobal) {
-    const cur = index.get(curGlobal);
-    if (!cur) break;
+  if (!child.parentGlobal) return resolved;
+  const parent = index.get(child.parentGlobal);
+  if (!parent) return resolved;
 
-    const curFull = getFullMethods(cur, index);
+  const parentFull = await getFullMethods(parent, index);
 
-    // nearest ancestor wins
-    for (const [k, m] of curFull.entries()) {
-      if (!resolved.has(k)) resolved.set(k, { method: m, definedIn: cur });
-    }
-
-    curGlobal = cur.parentGlobal;
+  for (const [k, entry] of parentFull.entries()) {
+    resolved.set(k, { method: entry.method, definedIn: entry.origin });
   }
 
   return resolved;
@@ -890,7 +912,7 @@ function generateInheritsHeader(
   index: Map<string, ClassInfo>
 ): string {
   const child = plan.child;
-  const guard = uppercaseGuard(`${child.global}_INHERITS_H`);
+  const guard = `${child.global}_INHERITS_H`;
 
   const lines: string[] = [];
   lines.push("#pragma once");
@@ -923,7 +945,7 @@ async function planGeneration(
     if (!parent) continue; // parent header not found even via deps
 
     // What methods exist in ancestors (nearest definition wins)
-    const ancestorResolved = resolveAncestorMethods(child, index);
+    const ancestorResolved = await resolveAncestorMethods(child, index);
 
     // What child already implements (definitions only)
     const cText = await readText(child.cPathAbs);

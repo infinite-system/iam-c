@@ -8,8 +8,14 @@
 #include "mod/iam/example/ancestry/Parent.h"
 
 /* === FIELDS === */
+#define iam_example_ancestry_Child_FIELD_LIST \
+  iam_example_ancestry_Parent_FIELD_LIST
 
-typedef iam_example_ancestry_Parent iam_example_ancestry_Child;
+typedef struct iam_example_ancestry_Child {
+#define IAMC_FIELD(name, type) type name;
+  iam_example_ancestry_Child_FIELD_LIST
+#undef IAMC_FIELD
+} iam_example_ancestry_Child;
 
 /* === METHODS === */
 

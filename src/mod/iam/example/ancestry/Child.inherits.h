@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef IAM_EXAMPLE_ANCESTRY_CHILD_INHERITS_H
-#define IAM_EXAMPLE_ANCESTRY_CHILD_INHERITS_H
+#ifndef iam_example_ancestry_Child_INHERITS_H
+#define iam_example_ancestry_Child_INHERITS_H
 
 void
 iam_example_ancestry_Child_describe(iam_example_ancestry_Child * self) {
@@ -10,12 +10,12 @@ iam_example_ancestry_Child_describe(iam_example_ancestry_Child * self) {
 
 double
 iam_example_ancestry_Child_diet(iam_example_ancestry_Child * self, double daysLength) {
-  return iam_example_ancestry_Parent_diet((iam_example_ancestry_Parent *)self, daysLength);
+  return iam_example_ancestry_GrandParent_diet((iam_example_ancestry_GrandParent *)self, daysLength);
 }
 
 double
 iam_example_ancestry_Child_eat(iam_example_ancestry_Child * self, double foodWeight) {
-  return iam_example_ancestry_Parent_eat((iam_example_ancestry_Parent *)self, foodWeight);
+  return iam_example_ancestry_GrandParent_eat((iam_example_ancestry_GrandParent *)self, foodWeight);
 }
 
 void
