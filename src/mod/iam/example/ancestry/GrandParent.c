@@ -1,4 +1,4 @@
-#include "module/iam/example/ancestry/GrandParent.h"
+#include "mod/iam/example/ancestry/GrandParent.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,7 +8,7 @@ IAMC_REQUIRE_IMPLEMENTED(iam_example_ancestry_GrandParent);
 #define GrandParent_(fn) iam_example_ancestry_GrandParent_##fn
 typedef iam_example_ancestry_GrandParent GrandParent;
 
-inline GrandParent *
+GrandParent *
 GrandParent_(constructor)(
   GrandParent *gp,
   const char *name,

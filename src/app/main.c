@@ -3,11 +3,15 @@
 #include "app/Rectangle.h"
 #include "app/Shape.h"
 #include "app/Triangle.h"
-#include "module/iam/core/iam.h"
-#include "module/iam/example/ancestry/GrandParent.h"
+#include "mod/iam/core/iam.h"
+#include "mod/iam/example/ancestry/Child.h"
+#include "mod/iam/example/ancestry/GrandParent.h"
+#include "mod/iam/example/ancestry/Parent.h"
 
-IAMC_USE_CLASS(iam_Kernel, Kernel)
-IAMC_USE_CLASS(iam_example_ancestry_GrandParent, GrandParent)
+IAMC_USING(iam_Kernel, Kernel)
+IAMC_USING(iam_example_ancestry_GrandParent, GrandParent)
+IAMC_USING(iam_example_ancestry_Parent, Parent)
+IAMC_USING(iam_example_ancestry_Child, Child)
 
 int
 main() {
@@ -50,6 +54,15 @@ main() {
 
   GrandParent *gp = GrandParent_new("John Doe", 75, 180, 80.5, 'M');
   GrandParent_describe(gp);
+
+  Parent *p = Parent_new("Jane Doe", 50, 165, 60.0, 'F');
+  Parent_diet(p, 7.0);
+  Parent_describe(p);
+
+  Child *c = Child_new("Child Doe", 30, 150, 50.0, 'M');
+  Child_work(c, 8.0);
+  Child_relax(c, 2.0);
+  Child_describe(c);
 
   return 0;
 }

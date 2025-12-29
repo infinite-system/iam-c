@@ -1,4 +1,6 @@
-// IAM_Helpers.h
+#pragma once
+
+// IAMC_Helpers.h
 #ifndef iam_string_H
 #define iam_string_H
 #include <stddef.h> // preferred for size_t
@@ -7,7 +9,8 @@ typedef char iam_str16[16];
 typedef char iam_str64[64];
 typedef char iam_str256[256];
 
-static inline void iam_strcpy(char *dst, size_t cap, const char *src) {
+static inline void
+iam_strcpy(char *dst, size_t cap, const char *src) {
   if (!src)
     src = "";
 

@@ -1,4 +1,4 @@
-
+#pragma once
 /* === MEMORY MACRO === */
 
 #define NEW(T) (T *)malloc(sizeof(T))
@@ -37,10 +37,10 @@
 
 /* === FIELD MACROS === */
 
-#define FIELD(name, type) type name;
-#define FIELD_ARRAY(name, type, size) type name[size];
-#define FIELD_FLEX(name, type) type name[];
-#define FIELD_BITS(name, type, bits) type name : bits;
+#define IAMC_FIELD(name, type) type name;
+#define IAMC_FIELD_ARRAY(name, type, size) type name[size];
+#define IAMC_FIELD_FLEX(name, type) type name[];
+#define IAMC_FIELD_BITS(name, type, bits) type name : bits;
 
 /* === METHOD DECLARATION MACROS === */
 
@@ -69,8 +69,8 @@
 
 // Strong enforcement: always active.
 // Usage in ONE .c file per class:
-//   #include "module/iam/.../Rectangle.h"
-//   #include "module/iam/core/iamc_require.h"
+//   #include "mod/iam/.../Rectangle.h"
+//   #include "mod/iam/core/iamc_require.h"
 //   IAMC_REQUIRE_IMPLEMENTED(iam_geometry_Rectangle);
 #define __IAMC_REQUIRE_IMPLEMENTED_DEBUG(Global)                               \
   static const void *const iamc_require_##Global##_anchors[]                   \
@@ -100,14 +100,14 @@
   static returnType(*Class##_##fn) args = Global##_##fn;
 
 // User-facing:
-//   IAMC_USE_CLASS(iam_Kernel, Kernel);
+//   IAMC_USING(iam_Kernel, Kernel);
 // gives:
 //   typedef iam_Kernel Kernel;
 //   static Kernel_register_prototype = iam_Kernel_register_prototype;
 //   static Kernel_boot               = iam_Kernel_boot;
 //   static Kernel_init               = iam_Kernel_init;
 //   ...
-#define IAMC_USE_CLASS(Global, LocalName)                                      \
+#define IAMC_USING(Global, LocalName)                                          \
   typedef Global LocalName;                                                    \
   Global##_METHOD_LIST(                                                        \
     __IAMC_LOCAL_INSTANCE, __IAMC_LOCAL_STATIC, Global, LocalName              \

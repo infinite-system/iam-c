@@ -2,7 +2,7 @@
 #define Rectangle_H
 
 #include "app/Shape.h"
-#include "module/iam/core/iam.h"
+#include "mod/iam/core/iam.h"
 
 void
 Rectangle_prototype(void);

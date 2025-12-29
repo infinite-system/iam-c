@@ -1,4 +1,4 @@
-#include "module/iam/core/Kernel.h"
+#include "mod/iam/core/Kernel.h"
 #include <stdlib.h>
 
 /* === ENFORCE METHODS IMPLEMENTATON === */
@@ -20,7 +20,7 @@ Kernel_(new)(int registry_cap) {
 inline Kernel *
 Kernel_(constructor)(Kernel *kernel, int registry_cap) {
   if (registry_cap <= 0) {
-    registry_cap = Kernel_(DEFAULT_REGISTRY_CAP);
+    registry_cap = iam_Kernel_DEFAULT_REGISTRY_CAP;
   }
   kernel->registry = malloc(sizeof(KernelRegistry) * registry_cap);
   kernel->registry_count = 0;
@@ -52,7 +52,7 @@ Kernel_(boot)(Kernel *kernel) {
 
 int
 Kernel_(get_default_registry_cap)() {
-  return Kernel_(DEFAULT_REGISTRY_CAP);
+  return iam_Kernel_DEFAULT_REGISTRY_CAP;
 }
 
 Kernel *

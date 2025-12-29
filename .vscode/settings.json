@@ -38,5 +38,6 @@
     "vector": "c",
     "areabyheightside.h": "c",
     "iam.h": "c"
-  }
+  },
+  "makefile.configureOnOpen": true
 }

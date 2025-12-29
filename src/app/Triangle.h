@@ -3,7 +3,7 @@
 
 #include "app/AreaByHeightSide.h"
 #include "app/Rectangle.h"
-#include "module/iam/core/iam.h"
+#include "mod/iam/core/iam.h"
 
 void
 Triangle_prototype(void);
@@ -35,7 +35,7 @@ typedef struct Triangle_Fn {
 #define METHOD(ret, name, ...) ret (*name)(Triangle *, ##__VA_ARGS__);
   Triangle_METHOD_LIST
 #undef METHOD
-      AreaBySideHeight_Adapter AreaBySideHeight;
+    AreaBySideHeight_Adapter AreaBySideHeight;
 } Triangle_Fn;
 
 extern Triangle_Fn Triangle_fn;

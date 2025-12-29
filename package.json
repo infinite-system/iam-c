@@ -1,0 +1,11 @@
+{
+  "name": "iamc-project",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "iamc-gen": "node --experimental-strip-types ./iamc.ts gen"
+  }
+}

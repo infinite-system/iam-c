@@ -1,7 +1,7 @@
 #ifndef Shape_H
 #define Shape_H
 
-#include "module/iam/core/iam.h"
+#include "mod/iam/core/iam.h"
 
 void
 Shape_prototype(void);

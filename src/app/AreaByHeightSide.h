@@ -1,7 +1,7 @@
 #ifndef AREA_BY_SIDE_HEIGHT_H
 #define AREA_BY_SIDE_HEIGHT_H
 
-#include "module/iam/core/iam.h"
+#include "mod/iam/core/iam.h"
 
 void
 AreaBySideHeight_prototype(void);
